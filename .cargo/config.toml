@@ -1,0 +1,10 @@
+[build]
+target = "x86_64-unknown-none.json"
+
+[unstable]
+build-std = ["core", "compiler_builtins"]
+
+[target.x86_64-unknown-none]
+linker = "rust-lld"
+# El linker script se especifica en RUSTFLAGS en build.sh
+

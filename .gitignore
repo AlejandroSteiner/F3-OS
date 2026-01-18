@@ -1,0 +1,38 @@
+# Binarios compilados
+kernel.bin
+*.bin
+*.o
+*.elf
+
+# Rust
+/target/
+**/*.rs.bk
+Cargo.lock
+
+# ISO y archivos de boot
+*.iso
+iso/
+limine/
+
+# Archivos temporales
+*.swp
+*.swo
+*~
+.DS_Store
+*.log
+
+# QEMU
+*.img
+*.qcow2
+
+# Build artifacts
+/tmp/
+*.tmp
+
+# Editor
+.vscode/
+.idea/
+*.iml
+
+# Logs
+grub_mkrescue.log
