@@ -67,32 +67,48 @@ echo ""
 # -display gtk: Ventana gráfica aislada
 # -m 256M: RAM virtual aislada (no afecta Ubuntu)
 # -no-reboot: No reinicia automáticamente
-# -machine type=pc: Máquina virtual estándar
+# -machine type=pc,acpi=off,hpet=off: Máquina virtual sin ACPI/HPET
 # -cpu qemu64: CPU virtual
 # -boot order=c: Sin acceso a disco real
 # -no-shutdown: No apaga el host
 # -serial stdio: Salida serial (segura)
 # -name "F3-OS": Nombre identificador
-# -snapshot: Modo snapshot (no escribe nada permanente)
 # -nodefaults: Sin dispositivos por defecto (máxima seguridad)
-# -no-acpi: Sin ACPI (reduce complejidad)
-# -no-hpet: Sin HPET (reduce complejidad)
 
-qemu-system-x86_64 \
-  -kernel kernel.bin \
-  -display gtk \
-  -m 256M \
-  -no-reboot \
-  -machine type=pc \
-  -cpu qemu64 \
-  -boot order=c \
-  -no-shutdown \
-  -serial stdio \
-  -name "F3-OS" \
-  -nodefaults \
-  -no-acpi \
-  -no-hpet \
-  "$@"
+# Intentar primero con -kernel (boot directo Multiboot)
+# Si falla, intentar con ISO si existe
+if [ -f f3os.iso ]; then
+    echo -e "${YELLOW}Usando ISO booteable...${NC}"
+    qemu-system-x86_64 \
+      -cdrom f3os.iso \
+      -display gtk \
+      -m 256M \
+      -no-reboot \
+      -machine type=pc,acpi=off,hpet=off \
+      -cpu qemu64 \
+      -boot order=d \
+      -no-shutdown \
+      -serial stdio \
+      -name "F3-OS" \
+      -nodefaults \
+      "$@"
+else
+    echo -e "${YELLOW}Intentando boot directo con Multiboot...${NC}"
+    # Usar -machine con opciones modernas (sin deprecaciones)
+    qemu-system-x86_64 \
+      -kernel kernel.bin \
+      -display gtk \
+      -m 256M \
+      -no-reboot \
+      -machine type=pc,acpi=off,hpet=off \
+      -cpu qemu64 \
+      -boot order=c \
+      -no-shutdown \
+      -serial stdio \
+      -name "F3-OS" \
+      -nodefaults \
+      "$@"
+fi
 
 EXIT_CODE=$?
 
