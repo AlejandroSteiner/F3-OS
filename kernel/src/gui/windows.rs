@@ -1,6 +1,9 @@
 // Windows System - Sistema de ventanas para GUI
 // Cada consulta puede tener su propia ventana
 
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::format;
 use super::query_process::QueryProcess;
 
 /// Ventana de GUI
@@ -101,8 +104,7 @@ impl WindowManager {
             100 + (self.windows.len() as i32 * 50),
             600,
             400,
-            // TODO: format! requiere alloc
-            "Consulta".to_string(),
+            format!("Consulta #{}", query_id),
         );
         
         window.associate_query_process(query_id);

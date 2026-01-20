@@ -1,6 +1,8 @@
 // Query Processor - Separador de consultas de procesos
 // Cada consulta del usuario crea un proceso separado
 
+use alloc::vec::Vec;
+use alloc::string::String;
 use super::query_process::QueryProcess;
 
 /// Procesador de consultas que separa cada consulta en un proceso independiente
@@ -17,7 +19,7 @@ impl QueryProcessor {
     /// Crea un nuevo procesador de consultas
     pub fn new() -> Self {
         Self {
-            query_processes: [None; 32],
+            query_processes: vec![None; 32],
             query_counter: 0,
             next_index: 0,
         }

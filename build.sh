@@ -54,7 +54,7 @@ echo "Target: bare metal kernel for QEMU emulator"
 export RUSTFLAGS="-C link-arg=-T${LINKER_SCRIPT}"
 cargo +nightly build \
   --target ../x86_64-unknown-none.json \
-  -Z build-std=core,compiler_builtins
+  -Z build-std=core,alloc,compiler_builtins
 
 BUILD_STATUS=$?
 if [ $BUILD_STATUS -ne 0 ]; then

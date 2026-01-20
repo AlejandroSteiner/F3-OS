@@ -1,6 +1,9 @@
 // AI Driver - Driver de AI para procesamiento de consultas
 // Integrado con el modelo F3
 
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::format;
 use crate::f3::{cpu, ram, mem};
 
 /// Driver de AI para procesar consultas del usuario
@@ -187,7 +190,12 @@ impl AIDriver {
                 "Ejecutando acción solicitada...".to_string()
             },
             "consultar_estado" => {
-                "Estado F3 consultado".to_string()
+                format!(
+                    "Estado F3: Fase {}, Entropía {}, Score {}",
+                    self.context.f3_state.phase,
+                    self.context.f3_state.entropy,
+                    self.context.f3_state.perfection_score
+                )
             },
             _ => {
                 "Procesando consulta...".to_string()

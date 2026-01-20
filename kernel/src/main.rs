@@ -1,10 +1,17 @@
 #![no_std]
 #![no_main]
+#![feature(alloc_error_handler)]
+#![feature(lang_items)]
+
+extern crate alloc;
 
 mod vga;
 mod f3;
 mod arch;
 mod boot;
+mod allocator;
+mod gui;
+mod drivers;
 
 use core::panic::PanicInfo;
 
@@ -15,7 +22,16 @@ pub extern "C" fn _start() -> ! {
     vga::print("Regla: Lógico → Ilógico → Síntesis → Perfecto\n");
     vga::print("===========================================\n\n");
 
+    // Inicializar allocator
+    allocator::init();
+    
+    // Inicializar F3 Core
     f3::init();
+    
+    // Inicializar GUI
+    gui::init();
+    
+    vga::print("GUI initialized\n");
 
     // Ciclo principal que demuestra el sistema
     let mut demo_cycle = 0;

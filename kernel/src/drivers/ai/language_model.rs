@@ -1,5 +1,9 @@
 // Language Model Driver - Modelo de lenguaje para procesamiento de consultas
 
+use alloc::vec::Vec;
+use alloc::string::String;
+use alloc::format;
+
 /// Modelo de lenguaje integrado
 /// Procesa consultas en lenguaje natural y genera respuestas
 pub struct LanguageModel {
@@ -11,26 +15,29 @@ pub struct LanguageModel {
 
 #[derive(Debug, Clone)]
 struct ModelContext {
-    /// Vocabulario F3 (array estático para no_std)
-    f3_vocabulary: [&'static str; 8],
-    /// Patrones conocidos (array estático para no_std)
-    known_patterns: [&'static str; 0],
+    /// Vocabulario F3
+    f3_vocabulary: Vec<String>,
+    /// Patrones conocidos
+    known_patterns: Vec<String>,
 }
 
 impl LanguageModel {
     /// Crea un nuevo modelo de lenguaje
     pub fn new() -> Self {
-        // TODO: vec! requiere alloc
-        // Por ahora, contexto vacío que se inicializará después
         Self {
             initialized: false,
             context: ModelContext {
-                f3_vocabulary: [
-                    "hilos", "embudo", "síntesis", 
-                    "retroalimentación", "fases", 
-                    "lógico", "ilógico", "perfecto"
+                f3_vocabulary: vec![
+                    "hilos".to_string(),
+                    "embudo".to_string(),
+                    "síntesis".to_string(),
+                    "retroalimentación inversa".to_string(),
+                    "fases".to_string(),
+                    "lógico".to_string(),
+                    "ilógico".to_string(),
+                    "perfecto".to_string(),
                 ],
-                known_patterns: [],
+                known_patterns: Vec::new(),
             },
         }
     }
@@ -55,17 +62,20 @@ impl LanguageModel {
     }
     
     /// Genera respuesta basada en consulta procesada
-    pub fn generate_response(&self, processed: &ProcessedQuery, _context: &str) -> String {
-        // TODO: Generar respuesta usando modelo de lenguaje
-        // Por ahora, generación básica
-        // Nota: format! y join requieren alloc
+    pub fn generate_response(&self, processed: &ProcessedQuery, context: &str) -> String {
+        // TODO: Generar respuesta usando modelo de lenguaje real
+        // Por ahora, generación básica basada en intención
         
         match processed.intent.as_str() {
             "explicar" => {
-                "Explicación generada".to_string()
+                if processed.entities.is_empty() {
+                    "Explicación generada".to_string()
+                } else {
+                    format!("Explicación sobre: {}", processed.entities.join(", "))
+                }
             },
             "consultar" => {
-                "Información consultada".to_string()
+                format!("Información: {}", context)
             },
             _ => {
                 "Respuesta generada por AI Driver".to_string()
@@ -75,10 +85,7 @@ impl LanguageModel {
     
     /// Tokeniza la consulta
     fn tokenize(&self, query: &str) -> Vec<String> {
-        // TODO: Vec requiere alloc
-        // Por ahora, retornar vector vacío
-        // En implementación completa, usar alloc::vec::Vec
-        Vec::new()
+        query.split_whitespace().map(|s| s.to_string()).collect()
     }
     
     /// Detecta intención
@@ -95,10 +102,16 @@ impl LanguageModel {
     
     /// Extrae entidades
     fn extract_entities(&self, query: &str) -> Vec<String> {
-        // TODO: Vec requiere alloc
-        // Por ahora, retornar vector vacío
-        // En implementación completa, usar alloc::vec::Vec
-        Vec::new()
+        let mut entities = Vec::new();
+        let query_lower = query.to_lowercase();
+        
+        for vocab in &self.context.f3_vocabulary {
+            if query_lower.contains(vocab) {
+                entities.push(vocab.clone());
+            }
+        }
+        
+        entities
     }
 }
 

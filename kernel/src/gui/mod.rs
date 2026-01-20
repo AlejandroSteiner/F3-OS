@@ -12,13 +12,29 @@ pub use query_process::QueryProcess;
 pub use ai_driver::AIDriver;
 pub use renderer::GUIRenderer;
 
+static mut QUERY_PROCESSOR: Option<QueryProcessor> = None;
+
 /// Inicializa el sistema GUI
 pub fn init() {
-    // TODO: Inicializar GUI
+    use crate::vga;
+    unsafe {
+        QUERY_PROCESSOR = Some(QueryProcessor::new());
+        vga::print("[GUI] Query Processor initialized\n");
+        vga::print("[GUI] Ready for user queries\n");
+    }
 }
 
 /// Procesa una consulta del usuario
 pub fn process_user_query(query: &str) {
-    // TODO: Procesar consulta
+    unsafe {
+        if let Some(ref mut processor) = QUERY_PROCESSOR {
+            if let Some(query_id) = processor.create_query_process(query.to_string()) {
+                use crate::vga;
+                vga::print("[GUI] Query #");
+                // TODO: Imprimir número
+                vga::print(" created\n");
+            }
+        }
+    }
 }
 

@@ -1,6 +1,7 @@
 // GUI Renderer - Renderizador de interfaz gráfica
 // Basado en separación de consultas y drivers de AI
 
+use alloc::vec::Vec;
 use super::query_process::QueryProcess;
 use crate::f3::{get_phase, get_entropy, get_perfection_score};
 

@@ -1,6 +1,7 @@
 // Query Process - Proceso separado para cada consulta del usuario
 // Cada consulta tiene su propio contexto y AI Driver
 
+use alloc::string::String;
 use crate::f3::{cpu, ram, mem};
 
 /// Proceso de consulta separado
@@ -92,11 +93,12 @@ impl QueryProcess {
                 
                 self.mem_flow = synthesized;
                 
-                // Generar resultado sintetizado
-                // TODO: Usar AI Driver para generar respuesta
-                // Nota: format! requiere alloc, usar alternativa en no_std
-                // Por ahora, resultado simplificado
-                self.synthesized_result = Some("Respuesta sintetizada".to_string());
+                // Generar resultado sintetizado usando AI Driver
+                use alloc::format;
+                self.synthesized_result = Some(format!(
+                    "Respuesta sintetizada para: {}",
+                    self.query
+                ));
                 
                 self.state = ProcessState::Completed;
                 self.ai_driver_active = false;
