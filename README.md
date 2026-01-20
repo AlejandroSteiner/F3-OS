@@ -243,7 +243,7 @@ Este proyecto está licenciado bajo la Licencia GPL-3.0 - ver el archivo [LICENS
 
 Preguntas, Notas y Pasos para la Comunidad: IMPORTANTE: Crear casilla de Feedback para concenso antes de modificar el sistema.
 
-cuando pensé en este sistema operativo fué por que necesito algo que aproveche mejor los recursos y tambien que este sistema podría ser el proximo paso para la adaptación cibil en controlar o implementar lenguajes de AI. 
+cuando pensé en este sistema operativo fué por que necesito algo que aproveche mejor los recursos y tambien que este sistema podría ser el proximo paso para la adaptación civil en controlar o implementar lenguajes de AI. 
 
 
 F3-OS: Funnel / Fiber / Feedback Operating System
