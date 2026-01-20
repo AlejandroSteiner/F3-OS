@@ -283,7 +283,41 @@ class GUIServer:
         def handler_factory(*args, **kwargs):
             return AssistantHTTPHandler(self.gui, *args, **kwargs)
         
-        self.server = HTTPServer(('localhost', self.port), handler_factory)
+        # Intentar iniciar el servidor, si el puerto está ocupado, intentar con otro
+        import socket
+        original_port = self.port
+        max_attempts = 5
+        
+        for attempt in range(max_attempts):
+            try:
+                # Verificar si el puerto está disponible
+                test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                test_socket.settimeout(1)
+                result = test_socket.connect_ex(('localhost', self.port))
+                test_socket.close()
+                
+                if result == 0:
+                    # Puerto ocupado, intentar siguiente
+                    if attempt < max_attempts - 1:
+                        print(f"⚠️  Puerto {self.port} está ocupado, intentando puerto {self.port + 1}...")
+                        self.port += 1
+                        continue
+                    else:
+                        raise OSError(f"No se pudo encontrar un puerto disponible después de {max_attempts} intentos")
+                
+                # Puerto disponible, crear servidor
+                self.server = HTTPServer(('localhost', self.port), handler_factory)
+                if original_port != self.port:
+                    print(f"ℹ️  Usando puerto {self.port} (el puerto {original_port} estaba ocupado)")
+                break
+                
+            except OSError as e:
+                if attempt < max_attempts - 1:
+                    self.port += 1
+                    continue
+                else:
+                    raise
+        
         self.running = True
         
         def run_server():
