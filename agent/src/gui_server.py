@@ -54,7 +54,6 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
     
     def _handle_index(self):
         """Sirve la página HTML principal"""
-        import os
         from pathlib import Path
         
         # Buscar index.html en gui_web/
@@ -62,35 +61,127 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
         html_path = script_dir / 'gui_web' / 'index.html'
         
         if html_path.exists():
-            with open(html_path, 'r', encoding='utf-8') as f:
-                html_content = f.read()
-            
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html; charset=utf-8')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.end_headers()
-            self.wfile.write(html_content.encode('utf-8'))
-        else:
-            # HTML básico si no existe el archivo
-            html = """
-<!DOCTYPE html>
-<html>
-<head><title>F3-OS Assistant</title></head>
+            try:
+                with open(html_path, 'r', encoding='utf-8') as f:
+                    html_content = f.read()
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/html; charset=utf-8')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                self.wfile.write(html_content.encode('utf-8'))
+                return
+            except Exception as e:
+                print(f"Error leyendo HTML: {e}")
+        
+        # HTML básico si no existe el archivo o hay error
+        html = """<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F3-OS Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #667eea; }
+        .status { background: #f0f0f0; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .endpoint { background: #e8f4f8; padding: 10px; margin: 10px 0; border-left: 3px solid #667eea; }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button { background: #667eea; color: white; cursor: pointer; }
+        button:hover { background: #5568d3; }
+        #response { margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 5px; }
+    </style>
+</head>
 <body>
-<h1>F3-OS Assistant</h1>
-<p>Servidor funcionando. Abre la consola del navegador para usar la API.</p>
-<p>Endpoints disponibles:</p>
-<ul>
-<li>GET /api/status - Estado del agente</li>
-<li>POST /api/query - Enviar consulta</li>
-</ul>
+    <div class="container">
+        <h1>🤖 F3-OS Assistant</h1>
+        <p>Servidor GUI del asistente funcionando correctamente.</p>
+        
+        <div class="status">
+            <h3>📊 Estado del Agente</h3>
+            <div id="status">Cargando...</div>
+        </div>
+        
+        <h3>💬 Chatear con el Asistente</h3>
+        <input type="text" id="query" placeholder="Escribe tu consulta..." style="width: 70%;" />
+        <button onclick="sendQuery()">Enviar</button>
+        <div id="response"></div>
+        
+        <h3>🔌 Endpoints API</h3>
+        <div class="endpoint">
+            <strong>GET /api/status</strong> - Estado del agente
+        </div>
+        <div class="endpoint">
+            <strong>POST /api/query</strong> - Enviar consulta al asistente
+        </div>
+    </div>
+    
+    <script>
+        // Cargar estado
+        fetch('/api/status')
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('status').innerHTML = `
+                    <p><strong>Fase:</strong> ${data.phase || 'N/A'}</p>
+                    <p><strong>Entropía:</strong> ${data.entropy || 0}/255</p>
+                    <p><strong>Perfection Score:</strong> ${data.perfection_score || 0}</p>
+                    <p><strong>CPU:</strong> ${data.cpu_percent || 0}%</p>
+                `;
+            })
+            .catch(e => document.getElementById('status').textContent = 'Error cargando estado');
+        
+        // Enviar consulta
+        function sendQuery() {
+            const query = document.getElementById('query').value;
+            if (!query) return;
+            
+            document.getElementById('response').textContent = 'Pensando...';
+            
+            fetch('/api/query', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({query: query})
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('response').innerHTML = 
+                    '<strong>Asistente:</strong> ' + (data.response || 'Sin respuesta');
+                document.getElementById('query').value = '';
+            })
+            .catch(e => {
+                document.getElementById('response').textContent = 'Error: ' + e.message;
+            });
+        }
+        
+        // Enter para enviar
+        document.getElementById('query').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendQuery();
+        });
+    </script>
 </body>
-</html>
-"""
-            self.send_response(200)
-            self.send_header('Content-Type', 'text/html; charset=utf-8')
-            self.end_headers()
-            self.wfile.write(html.encode('utf-8'))
+</html>"""
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        self.wfile.write(html.encode('utf-8'))
     
     def _handle_api_status(self):
         """Obtiene estado del agente para la API"""
