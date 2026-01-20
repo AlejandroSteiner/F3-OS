@@ -132,6 +132,7 @@ Esto generará `kernel.bin` en la raíz del proyecto.
 
 ### Documentos Técnicos
 
+- **[SEGURIDAD_Y_RESISTENCIA.md](SEGURIDAD_Y_RESISTENCIA.md)**: ⭐ Análisis de seguridad y resistencia a vulnerabilidades
 - **[INNOVACION_Y_VALOR.md](INNOVACION_Y_VALOR.md)**: Innovación y valor del sistema
 - **[GUIA_PRUEBAS_SEGURAS.md](GUIA_PRUEBAS_SEGURAS.md)**: Guía para pruebas seguras en QEMU
 - **[DEBUG_GRUB.md](DEBUG_GRUB.md)**: Troubleshooting de problemas con GRUB
