@@ -1,0 +1,106 @@
+# F3-OS Governance Agent Configuration
+
+github:
+  # Token de GitHub (crear en Settings > Developer settings > Personal access tokens)
+  # Necesita permisos: repo, pull_requests, issues
+  token: "ghp_YOUR_TOKEN_HERE"
+  
+  # Repositorio
+  owner: "AlejandroSteiner"
+  repo: "F3-OS"
+  
+  # Branch principal
+  main_branch: "main"
+
+# Modelo F3 - Conceptos clave
+f3_model:
+  # Núcleo sagrado (archivos que requieren discusión previa)
+  sacred_core:
+    - "kernel/src/f3/core.rs"
+    - "kernel/src/f3/cpu.rs"
+    - "kernel/src/f3/ram.rs"
+    - "kernel/src/f3/mem.rs"
+    - "MANIFIESTO.md"
+    - "GOVERNANCE.md"
+  
+  # Vocabulario F3 (debe usarse correctamente)
+  vocabulary:
+    - "hilos"  # No "threads" en sentido tradicional
+    - "embudo"  # Funnel, F3 Core
+    - "síntesis"  # No "promedio" o "agregación"
+    - "retroalimentación inversa"  # Enrollado inverso
+    - "fases"  # Lógico, Ilógico, Síntesis, Perfecto
+  
+  # Términos que NO deben usarse (genéricos)
+  forbidden_terms:
+    - "threads"  # Usar "hilos"
+    - "average"  # Usar "síntesis"
+    - "aggregation"  # Usar "síntesis"
+
+# Reglas de evaluación
+evaluation:
+  # Tamaño máximo de PR (líneas)
+  max_pr_size: 300
+  
+  # Tamaño mínimo para considerar "grande"
+  large_pr_threshold: 200
+  
+  # Requiere discusión previa si afecta núcleo sagrado
+  require_discussion_for_sacred: true
+  
+  # Auto-aceptar PRs pequeños y claramente alineados
+  auto_approve_small: true
+  auto_approve_threshold: 50  # líneas
+
+# Ciclo de desarrollo adaptativo
+development_cycle:
+  # Duración de cada fase (en número de PRs procesados)
+  logical_phase_duration: 10
+  illogical_phase_duration: 5
+  synthesis_phase_duration: 3
+  perfect_phase_duration: 8
+  
+  # Entropía inicial para fase ilógica
+  illogical_entropy_start: 100
+  
+  # Umbral de entropía para transición
+  entropy_threshold: 200
+
+# AI/ML (opcional)
+ai:
+  # Usar modelo de AI para síntesis (requiere API key)
+  use_ai_synthesis: false
+  
+  # Provider: "openai", "anthropic", "local"
+  provider: "openai"
+  
+  # API keys (usar variables de entorno en producción)
+  openai_api_key: ""
+  anthropic_api_key: ""
+  
+  # Modelo a usar
+  model: "gpt-4"
+  
+  # Temperature para generación
+  temperature: 0.3  # Bajo para decisiones más deterministas
+
+# Límites de recursos
+resources:
+  # Máximo uso de CPU permitido (porcentaje)
+  max_cpu_percent: 20.0
+  
+  # Objetivo de uso de CPU (porcentaje)
+  target_cpu_percent: 15.0
+  
+  # Intervalo de verificación de recursos (segundos)
+  check_interval: 1.0
+  
+  # Duración de pausa entre operaciones (segundos)
+  sleep_duration: 0.1
+
+# Logging
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  file: "logs/agent.log"
+  console: true
+

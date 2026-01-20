@@ -217,12 +217,15 @@ Este ciclo se repite continuamente, mejorando el sistema en cada iteración.
 **Antes de contribuir, lee**:
 - [MANIFIESTO.md](MANIFIESTO.md) - Filosofía y principios del proyecto
 - [CONTRIBUTING.md](CONTRIBUTING.md) - Reglas estrictas de contribución
+- [AGENTE_GOBERNANTE.md](AGENTE_GOBERNANTE.md) - Cómo el agente AI gobierna el desarrollo
 
 F3-OS tiene reglas específicas:
 - PRs pequeños (máximo 200-300 líneas)
 - Cambios conceptuales requieren discusión previa
 - Nada de features "porque sí"
 - Respeta el vocabulario y modelo F3
+
+**🤖 El Agente Gobernante**: F3-OS tiene un agente AI que evalúa automáticamente los PRs según el modelo F3. Ver [agent/README.md](agent/README.md) para más información.
 
 **No contribuyas si**:
 - Buscas un proyecto "fácil" o tradicional
