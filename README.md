@@ -8,7 +8,7 @@
 
 > **⚠️ IMPORTANTE**: Lee el [MANIFIESTO.md](MANIFIESTO.md) antes de contribuir. F3-OS no es un sistema operativo tradicional. Es un experimento cognitivo a nivel kernel con reglas y filosofía específicas.
 
-## 🤖 Agente Gobernante AI - Interfaz GUI
+## Agente Gobernante AI - Interfaz GUI
 
 F3-OS incluye un **agente AI especializado** que gobierna el desarrollo del proyecto y actúa como asistente interactivo para los usuarios. La interfaz presenta un diseño futurista estilo Star Wars/Fórmula 1.
 
@@ -36,7 +36,7 @@ cd agent
 
 Ver [agent/README.md](agent/README.md) para más información.
 
-## 🎯 Concepto Principal
+## Concepto Principal
 
 F3-OS está inspirado en la metáfora gráfica de **"enrollar 3 hilos de fibra óptica en su cartucho en reversa"**, lo cual se traduce técnicamente en:
 
@@ -45,7 +45,7 @@ F3-OS está inspirado en la metáfora gráfica de **"enrollar 3 hilos de fibra �
 - **Retropropagación Inversa**: El estado final reescribe decisiones anteriores
 - **Ciclo Adaptativo**: Lógico → Ilógico → Síntesis → Perfecto
 
-## 🏗️ Arquitectura
+## Arquitectura
 
 ### 3 Hilos Fundamentales
 
@@ -109,7 +109,7 @@ f3-os/
 └── README.md              # Este archivo
 ```
 
-## 🚀 Inicio Rápido
+## Inicio Rápido
 
 ### Requisitos
 
@@ -241,7 +241,7 @@ Esta regla se implementa como el ciclo de fases del sistema:
 
 Este ciclo se repite continuamente, mejorando el sistema en cada iteración.
 
-## 🤝 Contribuir
+## Contribuir
 
 **Antes de contribuir, lee**:
 - [MANIFIESTO.md](MANIFIESTO.md) - Filosofía y principios del proyecto
@@ -254,7 +254,7 @@ F3-OS tiene reglas específicas:
 - Nada de features "porque sí"
 - Respeta el vocabulario y modelo F3
 
-**🤖 El Agente Gobernante**: F3-OS tiene un agente AI que evalúa automáticamente los PRs según el modelo F3. Ver [agent/README.md](agent/README.md) para más información.
+** El Agente Gobernante**: F3-OS tiene un agente AI que evalúa automáticamente los PRs según el modelo F3. Ver [agent/README.md](agent/README.md) para más información.
 
 **No contribuyas si**:
 - Buscas un proyecto "fácil" o tradicional
@@ -268,22 +268,22 @@ F3-OS tiene reglas específicas:
 
 Ver [CONTRIBUTING.md](CONTRIBUTING.md) para el proceso completo.
 
-## 📄 Licencia
+## Licencia
 
 Este proyecto está licenciado bajo la Licencia GPL-3.0 - ver el archivo [LICENSE](LICENSE) para más detalles.
 
-## 👤 Autor
+## Autor
 
 **AlejandroSteiner**
 
-## 🙏 Agradecimientos
+## Agradecimientos
 
 - Rust community por el excelente lenguaje
 - QEMU project por el emulador
 - GRUB project por el bootloader
 - Comunidad de OSDev por recursos y conocimiento
 
-## 📚 Recursos
+## Recursos
 
 - [OSDev Wiki](https://wiki.osdev.org/)
 - [Writing an OS in Rust](https://os.phil-opp.com/)
