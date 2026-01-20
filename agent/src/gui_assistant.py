@@ -71,10 +71,18 @@ class GUIAssistant:
         # Analizador de proyecto (para búsquedas específicas)
         self.project_analyzer = ProjectAnalyzer(project_root=project_root)
         
+        # Aprendizaje en internet (separado del entorno del usuario)
+        if hasattr(governance_core, 'internet_learner'):
+            self.internet_learner = governance_core.internet_learner
+        else:
+            from .internet_learning import InternetLearner, NetworkManager
+            network_manager = NetworkManager(config)
+            self.internet_learner = InternetLearner(config, network_manager)
+        
         # Respuestas predefinidas
         self._init_responses()
         
-        logger.info("GUIAssistant inicializado con base de conocimiento completa")
+        logger.info("GUIAssistant inicializado con base de conocimiento completa y aprendizaje en internet")
     
     def _init_responses(self):
         """Inicializa respuestas y patrones de conversación"""
@@ -186,6 +194,10 @@ class GUIAssistant:
         if any(word in input_lower for word in ['ayuda', 'help', 'qué puedes hacer']):
             return 'help'
         
+        # Preguntas que requieren aprendizaje en internet
+        if any(word in input_lower for word in ['aprender', 'internet', 'buscar', 'investigar', 'cómo hacer', 'tutorial']):
+            return 'internet_learning'
+        
         # Por defecto: conversación general
         return 'general'
     
@@ -284,8 +296,46 @@ class GUIAssistant:
             response += "- 📊 Ver estado del sistema\n"
             response += "- 💻 Preguntas sobre desarrollo\n"
             response += "- 📚 Explicación completa desde cero\n"
-            response += "- 🧭 Navegar por el sistema\n\n"
+            response += "- 🧭 Navegar por el sistema\n"
+            response += "- 🌐 Aprender de internet (hasta 50% de red disponible)\n\n"
             response += "¿Qué te gustaría saber?"
+            return response
+        
+        elif intent == 'internet_learning':
+            # Aprendizaje libre en internet (separado del entorno del usuario)
+            logger.info(f"Aprendizaje en internet solicitado: {user_input}")
+            
+            # Extraer query de aprendizaje
+            learning_query = user_input
+            if 'aprender' in learning_query.lower():
+                learning_query = learning_query.replace('aprender', '').replace('sobre', '').strip()
+            
+            # Buscar y aprender de internet
+            learned_sources = self.internet_learner.search_and_learn(learning_query, max_results=3)
+            
+            if learned_sources:
+                response = f"🌐 **Aprendiendo de Internet (50% de red disponible):**\n\n"
+                response += f"He encontrado {len(learned_sources)} fuentes relevantes:\n\n"
+                
+                for i, source in enumerate(learned_sources, 1):
+                    response += f"**{i}. {source.title}**\n"
+                    response += f"   URL: {source.url}\n"
+                    response += f"   Relevancia: {source.relevance_score:.2f}\n"
+                    response += f"   Tags: {', '.join(source.tags[:3])}\n"
+                    response += f"   Contenido: {source.content[:200]}...\n\n"
+                
+                # Aplicar conocimiento aprendido
+                applied = self.internet_learner.apply_learned_knowledge({'query': learning_query})
+                if applied.get('insights'):
+                    response += "**Insights:**\n"
+                    for insight in applied['insights']:
+                        response += f"- {insight}\n"
+                
+                response += "\n💡 Este conocimiento se ha integrado en mi base de datos para completar el propósito del proyecto."
+            else:
+                response = f"⚠️ No pude encontrar fuentes relevantes para '{learning_query}'.\n"
+                response += "¿Podrías reformular tu pregunta o ser más específico?"
+            
             return response
         
         else:  # general
@@ -306,7 +356,19 @@ class GUIAssistant:
                         response += f"**En {filename}:**\n{content[:500]}...\n\n"
                     response += "¿Quieres que profundice en algún aspecto específico?"
                 else:
-                    return self._generate_general_response(user_input)
+                    # Si no hay información local, intentar aprender de internet
+                    logger.info(f"No se encontró información local, intentando aprendizaje en internet: {user_input}")
+                    learned_sources = self.internet_learner.search_and_learn(user_input, max_results=2)
+                    
+                    if learned_sources:
+                        response = f"🌐 **No encontré información local, pero aprendí de internet:**\n\n"
+                        for source in learned_sources:
+                            response += f"**{source.title}**\n"
+                            response += f"{source.content[:300]}...\n"
+                            response += f"Fuente: {source.url}\n\n"
+                        response += "💡 Este conocimiento se ha integrado para completar el propósito del proyecto."
+                    else:
+                        return self._generate_general_response(user_input)
             return response
     
     def _generate_general_response(self, user_input: str) -> str:

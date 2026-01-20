@@ -10,6 +10,7 @@ from .context_manager import ContextManager
 from .synthesis_engine import SynthesisEngine
 from .development_phase import DevelopmentCycle
 from .resource_manager import ResourceManager, ThrottledOperation
+from .internet_learning import InternetLearner, NetworkManager
 
 
 class GovernanceCore:
@@ -22,8 +23,14 @@ class GovernanceCore:
         self.synthesis_engine = SynthesisEngine(config)
         self.development_cycle = DevelopmentCycle(config)
         self.resource_manager = ResourceManager(config)
+        
+        # Gestión de red y aprendizaje en internet
+        self.network_manager = NetworkManager(config)
+        self.internet_learner = InternetLearner(config, self.network_manager)
+        
         # Iniciar monitoreo de recursos
         self.resource_manager.start_monitoring()
+        self.network_manager.start_monitoring()
     
     def evaluate_pr(self, pr_data: Dict) -> Dict:
         """

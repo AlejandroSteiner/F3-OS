@@ -77,7 +77,8 @@ echo ""
 
 # Configuración de red para acceso al servidor GUI del agente
 # User networking permite acceso al host en 10.0.2.2
-NETWORK_ARGS="-netdev user,id=net0,hostfwd=tcp::8080-:8080 -device rtl8139,netdev=net0"
+# No necesitamos port forwarding porque el servidor GUI escucha en 0.0.0.0
+NETWORK_ARGS="-netdev user,id=net0 -device rtl8139,netdev=net0"
 
 # Intentar primero con -kernel (boot directo Multiboot)
 # Si falla, intentar con ISO si existe

@@ -87,16 +87,53 @@ ai:
 # Límites de recursos
 resources:
   # Máximo uso de CPU permitido (porcentaje)
-  max_cpu_percent: 20.0
+  # Aumentado a 25% para permitir aprendizaje en internet
+  max_cpu_percent: 25.0
   
   # Objetivo de uso de CPU (porcentaje)
-  target_cpu_percent: 15.0
+  target_cpu_percent: 20.0
   
   # Intervalo de verificación de recursos (segundos)
   check_interval: 1.0
   
   # Duración de pausa entre operaciones (segundos)
   sleep_duration: 0.1
+
+# Gestión de red para aprendizaje en internet
+network:
+  # Máximo ancho de banda permitido (porcentaje de disponibilidad)
+  max_bandwidth_percent: 50.0
+  
+  # Objetivo de ancho de banda (porcentaje)
+  target_bandwidth_percent: 40.0
+  
+  # Intervalo de verificación de red (segundos)
+  check_interval: 1.0
+  
+  # Delay entre peticiones HTTP (segundos)
+  request_delay: 0.5
+
+# Aprendizaje libre en internet
+internet_learning:
+  # Habilitar aprendizaje en internet
+  enabled: true
+  
+  # Dominios permitidos para aprendizaje
+  allowed_domains:
+    - "github.com"
+    - "stackoverflow.com"
+    - "rust-lang.org"
+    - "osdev.org"
+    - "wikipedia.org"
+    - "docs.rs"
+    - "reddit.com"
+    - "hackernews.com"
+  
+  # Máximo de fuentes a aprender por consulta
+  max_sources_per_query: 5
+  
+  # Cachear conocimiento aprendido
+  cache_learned: true
 
 # GUI Assistant
 gui_assistant:

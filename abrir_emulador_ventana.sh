@@ -24,7 +24,7 @@ if [ -f f3os.iso ]; then
       -serial stdio \
       -name "F3-OS" \
       -nodefaults \
-      -netdev user,id=net0,hostfwd=tcp::8080-:8080 \
+      -netdev user,id=net0 \
       -device rtl8139,netdev=net0
 else
     exec qemu-system-x86_64 \
@@ -39,6 +39,6 @@ else
       -serial stdio \
       -name "F3-OS" \
       -nodefaults \
-      -netdev user,id=net0,hostfwd=tcp::8080-:8080 \
+      -netdev user,id=net0 \
       -device rtl8139,netdev=net0
 fi

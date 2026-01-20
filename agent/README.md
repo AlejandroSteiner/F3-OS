@@ -2,6 +2,17 @@
 
 Agente AI especializado que gobierna el desarrollo de F3-OS, manteniendo coherencia con el modelo F3.
 
+## 🌐 Aprendizaje Libre en Internet
+
+El agente tiene capacidad de **aprender libremente de internet** para completar el propósito del proyecto:
+- ✅ Consume hasta **25% de CPU** (aumentado para aprendizaje)
+- ✅ Consume hasta **50% de la disponibilidad de conexión de red**
+- ✅ Aprende de GitHub, Stack Overflow, documentación técnica, etc.
+- ✅ Integra conocimiento aprendido en su base de datos
+- ✅ **Separado del entorno del usuario** - no interfiere con la navegación
+
+Ver [APRENDIZAJE_INTERNET.md](APRENDIZAJE_INTERNET.md) para más detalles.
+
 ## Arquitectura
 
 El agente replica la estructura del F3 Core:
@@ -10,6 +21,8 @@ El agente replica la estructura del F3 Core:
 - **Context Manager** (RAM Thread): Mantiene contexto del proyecto
 - **Synthesis Engine** (MEM Thread): Sintetiza propuestas y genera feedback
 - **Governance Core** (F3 Core): Toma decisiones finales
+- **Internet Learner** (Nuevo): Aprende de internet para completar el proyecto
+- **Network Manager** (Nuevo): Gestiona uso de red (hasta 50% disponible)
 
 ## Instalación
 

@@ -15,8 +15,8 @@ from datetime import datetime, timedelta
 @dataclass
 class ResourceLimits:
     """Límites de recursos del agente"""
-    max_cpu_percent: float = 20.0  # Máximo 20% de CPU
-    target_cpu_percent: float = 15.0  # Objetivo 15% de CPU
+    max_cpu_percent: float = 25.0  # Máximo 25% de CPU (aumentado para aprendizaje)
+    target_cpu_percent: float = 20.0  # Objetivo 20% de CPU
     check_interval: float = 1.0  # Verificar cada segundo
     sleep_duration: float = 0.1  # Dormir entre operaciones
 
@@ -29,8 +29,8 @@ class ResourceManager:
         resource_config = config.get('resources', {})
         
         self.limits = ResourceLimits(
-            max_cpu_percent=resource_config.get('max_cpu_percent', 20.0),
-            target_cpu_percent=resource_config.get('target_cpu_percent', 15.0),
+            max_cpu_percent=resource_config.get('max_cpu_percent', 25.0),
+            target_cpu_percent=resource_config.get('target_cpu_percent', 20.0),
             check_interval=resource_config.get('check_interval', 1.0),
             sleep_duration=resource_config.get('sleep_duration', 0.1),
         )
