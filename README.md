@@ -280,4 +280,3 @@ Este proyecto está licenciado bajo la Licencia GPL-3.0 - ver el archivo [LICENS
 **⚠️ Advertencia**: Este es un proyecto experimental. No use en producción. Úsalo bajo tu propio riesgo.
 
 **⭐ Si te gusta este proyecto, considera darle una estrella en GitHub!**
-
