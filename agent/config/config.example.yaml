@@ -98,6 +98,17 @@ resources:
   # Duración de pausa entre operaciones (segundos)
   sleep_duration: 0.1
 
+# GUI Assistant
+gui_assistant:
+  # Personalidad del asistente: friendly, technical, adaptive
+  personality: "adaptive"
+  
+  # Nombre del usuario
+  user_name: "Usuario"
+  
+  # Activar contexto del sistema
+  context_aware: true
+
 # Logging
 logging:
   level: "INFO"  # DEBUG, INFO, WARNING, ERROR

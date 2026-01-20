@@ -11,6 +11,7 @@ from typing import Dict
 from .governance_core import GovernanceCore
 from .github_integration import GitHubIntegration
 from .resource_manager import ResourceManager
+from .gui_integration import GUIIntegration, AssistantAPI
 
 
 def load_config(config_path: Path) -> Dict:
@@ -123,6 +124,35 @@ def run_cycle(config: Dict, data_dir: Path):
     show_status(config, data_dir)
 
 
+def start_gui_server(config: Dict, data_dir: Path, port: int = 8080):
+    """Inicia servidor HTTP para GUI del asistente"""
+    print(f"🎨 Iniciando servidor GUI del asistente en puerto {port}...")
+    
+    from .gui_server import GUIServer
+    
+    governance = GovernanceCore(config, data_dir)
+    resource_manager = ResourceManager(config)
+    resource_manager.start_monitoring()
+    
+    from .gui_integration import GUIIntegration
+    gui = GUIIntegration(governance, resource_manager, config)
+    
+    server = GUIServer(gui, port=port)
+    server.start()
+    
+    print(f"✅ Servidor iniciado. GUI puede conectarse a http://localhost:{port}")
+    print("Presiona Ctrl+C para detener")
+    
+    try:
+        while True:
+            import time
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\n🛑 Deteniendo servidor...")
+        server.stop()
+        resource_manager.stop_monitoring()
+
+
 def main():
     """Punto de entrada principal"""
     parser = argparse.ArgumentParser(
@@ -131,7 +161,7 @@ def main():
     
     parser.add_argument(
         'command',
-        choices=['evaluate-pr', 'monitor', 'status', 'cycle'],
+        choices=['evaluate-pr', 'monitor', 'status', 'cycle', 'gui-server'],
         help='Comando a ejecutar'
     )
     
@@ -161,6 +191,13 @@ def main():
         help='Ejecutar sin hacer cambios en GitHub'
     )
     
+    parser.add_argument(
+        '--port',
+        type=int,
+        default=8080,
+        help='Puerto para servidor GUI (para gui-server)'
+    )
+    
     args = parser.parse_args()
     
     # Cargar configuración
@@ -184,6 +221,9 @@ def main():
     
     elif args.command == 'cycle':
         run_cycle(config, args.data_dir)
+    
+    elif args.command == 'gui-server':
+        start_gui_server(config, args.data_dir, args.port)
 
 
 if __name__ == '__main__':

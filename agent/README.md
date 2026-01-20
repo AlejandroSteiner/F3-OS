@@ -44,6 +44,14 @@ python -m src.main monitor
 python -m src.main cycle
 ```
 
+### Iniciar servidor GUI del asistente
+
+```bash
+python -m src.main gui-server --port 8080
+```
+
+Esto inicia un servidor HTTP que la GUI de F3-OS puede usar para comunicarse con el asistente.
+
 ## Documentación
 
 Ver [AGENTE_GOBERNANTE.md](../AGENTE_GOBERNANTE.md) para la visión completa.
