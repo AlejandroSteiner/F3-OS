@@ -20,45 +20,38 @@ if [ ! -f config/config.yaml ]; then
     echo ""
 fi
 
-# Verificar que las dependencias están instaladas
-if ! python3 -c "import yaml, github, psutil" 2>/dev/null; then
-    echo "⚠️  Advertencia: Dependencias no instaladas"
-    echo ""
-    echo "Opciones para instalar dependencias:"
-    echo ""
-    echo "1. Usar entorno virtual (recomendado):"
-    echo "   python3 -m venv venv"
-    echo "   source venv/bin/activate"
-    echo "   pip install -r requirements.txt"
-    echo "   ./run.sh [comando]"
-    echo ""
-    echo "2. Instalar con pipx:"
-    echo "   pipx install -r requirements.txt"
-    echo ""
-    echo "3. Instalar manualmente:"
-    echo "   pip3 install --user -r requirements.txt"
-    echo ""
-    echo "4. Usar pip con --break-system-packages (no recomendado):"
-    echo "   pip3 install --break-system-packages -r requirements.txt"
-    echo ""
-    read -p "¿Deseas intentar instalar con --user? (s/n): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Ss]$ ]]; then
-        pip3 install --user -r requirements.txt
-        if [ $? -eq 0 ]; then
-            echo "✅ Dependencias instaladas"
-        else
-            echo "❌ Error instalando dependencias"
-            echo "Por favor, instala manualmente usando una de las opciones arriba"
-            exit 1
-        fi
-    else
-        echo "Por favor, instala las dependencias manualmente antes de continuar"
+# Verificar si existe entorno virtual
+if [ -d "venv" ]; then
+    # Usar entorno virtual si existe
+    echo "🔌 Usando entorno virtual..."
+    source venv/bin/activate
+    PYTHON_CMD="python3"
+elif python3 -c "import yaml, github, psutil" 2>/dev/null; then
+    # Dependencias ya instaladas globalmente
+    PYTHON_CMD="python3"
+else
+    # Crear y configurar entorno virtual automáticamente
+    echo "📦 Creando entorno virtual automáticamente..."
+    if ! python3 -m venv venv 2>/dev/null; then
+        echo "❌ Error: No se pudo crear entorno virtual"
+        echo "Instala python3-venv: sudo apt install python3-venv"
         exit 1
     fi
-    echo ""
+    
+    source venv/bin/activate
+    echo "📥 Instalando dependencias en entorno virtual..."
+    pip install --upgrade pip > /dev/null 2>&1
+    pip install -r requirements.txt
+    
+    if [ $? -ne 0 ]; then
+        echo "❌ Error instalando dependencias"
+        exit 1
+    fi
+    
+    echo "✅ Entorno virtual configurado"
+    PYTHON_CMD="python3"
 fi
 
 # Ejecutar el agente
-python3 run_agent.py "$@"
+$PYTHON_CMD run_agent.py "$@"
 
