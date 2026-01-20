@@ -93,6 +93,18 @@ resources:
   # Objetivo de uso de CPU (porcentaje)
   target_cpu_percent: 20.0
   
+  # Máximo uso de RAM permitido (GB)
+  max_ram_gb: 8.0
+  
+  # Objetivo de uso de RAM (GB)
+  target_ram_gb: 6.0
+  
+  # Núcleos disponibles para el agente
+  available_cores: 6
+  
+  # Hilos disponibles para el agente
+  available_threads: 12
+  
   # Intervalo de verificación de recursos (segundos)
   check_interval: 1.0
   

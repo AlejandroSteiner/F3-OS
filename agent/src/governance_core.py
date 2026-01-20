@@ -4,13 +4,19 @@ Governance Core - Equivalente a F3 Core
 Toma decisiones finales basadas en síntesis de todos los componentes.
 """
 
+import logging
 from typing import Dict, Optional
+from pathlib import Path
+
+logger = logging.getLogger(__name__)
 from .code_analyzer import CodeAnalyzer
 from .context_manager import ContextManager
 from .synthesis_engine import SynthesisEngine
 from .development_phase import DevelopmentCycle
 from .resource_manager import ResourceManager, ThrottledOperation
 from .internet_learning import InternetLearner, NetworkManager
+from .agent_rules import AgentRulesSystem
+from .autonomous_executor import AutonomousExecutor
 
 
 class GovernanceCore:
@@ -28,9 +34,43 @@ class GovernanceCore:
         self.network_manager = NetworkManager(config)
         self.internet_learner = InternetLearner(config, self.network_manager)
         
+        # Sistema de reglas del agente (qué hacer, dónde parar, dónde buscar, cómo implementar)
+        project_root = config.get('project_root', None)
+        if project_root:
+            project_root = Path(project_root)
+        else:
+            # Intentar detectar project_root desde data_dir
+            project_root = data_dir.parent if hasattr(data_dir, 'parent') else Path.cwd()
+        
+        self.agent_rules = AgentRulesSystem(project_root=project_root)
+        
+        # Ejecutor autónomo (permite implementar código automáticamente)
+        self.autonomous_executor = AutonomousExecutor(
+            project_root=project_root,
+            agent_rules=self.agent_rules,
+            resource_manager=self.resource_manager
+        )
+        
+        # Aplicar límites de recursos desde reglas
+        rule_limits = self.agent_rules.get_resource_limits()
+        if rule_limits:
+            # Actualizar límites si están definidos en reglas
+            if 'max_cpu_percent' in rule_limits:
+                self.resource_manager.limits.max_cpu_percent = rule_limits['max_cpu_percent']
+            if 'max_ram_gb' in rule_limits:
+                self.resource_manager.limits.max_ram_gb = rule_limits['max_ram_gb']
+            if 'available_cores' in rule_limits:
+                self.resource_manager.limits.available_cores = rule_limits['available_cores']
+            if 'available_threads' in rule_limits:
+                self.resource_manager.limits.available_threads = rule_limits['available_threads']
+        
         # Iniciar monitoreo de recursos
         self.resource_manager.start_monitoring()
         self.network_manager.start_monitoring()
+        
+        logger.info("✅ Sistema de reglas cargado - El agente sabe qué hacer, dónde parar, dónde buscar y cómo implementar")
+        logger.info("✅ Ejecutor autónomo habilitado - El agente puede implementar código automáticamente")
+        logger.info("🤖 SISTEMA 100% AUTÓNOMO ACTIVADO")
     
     def evaluate_pr(self, pr_data: Dict) -> Dict:
         """

@@ -133,6 +133,10 @@ class InternetLearner:
     
     def learn_from_url(self, url: str, query: Optional[str] = None) -> Optional[LearningSource]:
         """Aprende de una URL específica"""
+        from .activity_stream import log_internet_learn
+        
+        activity = log_internet_learn(url, "")
+        """Aprende de una URL específica"""
         if not self.learning_enabled:
             return None
         
@@ -174,6 +178,12 @@ class InternetLearner:
             self.learned_sources.append(source)
             logger.info(f"✅ Aprendido de: {url} (relevancia: {relevance:.2f})")
             
+            # Actualizar actividad
+            from .activity_stream import get_activity_stream
+            stream = get_activity_stream()
+            stream.update_activity(activity.id, status="success", 
+                                 description=f"Relevancia: {relevance:.2f}")
+            
             return source
             
         except Exception as e:
@@ -184,6 +194,9 @@ class InternetLearner:
         """Busca y aprende de múltiples fuentes"""
         if not self.learning_enabled:
             return []
+        
+        from .activity_stream import log_internet_search
+        activity = log_internet_search(query, 0)
         
         sources = []
         
@@ -198,6 +211,13 @@ class InternetLearner:
             # Buscar en Stack Overflow (web scraping básico)
             # stack_results = self._search_stackoverflow(search_query)
             # sources.extend(stack_results)
+        
+        # Actualizar actividad con resultados
+        from .activity_stream import get_activity_stream
+        stream = get_activity_stream()
+        stream.update_activity(activity.id, status="success",
+                             description=f"Encontradas {len(sources)} fuentes",
+                             details={'results_count': len(sources)})
         
         return sources[:max_results]
     

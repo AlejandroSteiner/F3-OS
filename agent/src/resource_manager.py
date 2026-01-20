@@ -17,6 +17,10 @@ class ResourceLimits:
     """Límites de recursos del agente"""
     max_cpu_percent: float = 25.0  # Máximo 25% de CPU (aumentado para aprendizaje)
     target_cpu_percent: float = 20.0  # Objetivo 20% de CPU
+    max_ram_gb: float = 8.0  # Máximo 8GB de RAM
+    target_ram_gb: float = 6.0  # Objetivo 6GB de RAM
+    available_cores: int = 6  # 6 núcleos disponibles
+    available_threads: int = 12  # 12 hilos disponibles
     check_interval: float = 1.0  # Verificar cada segundo
     sleep_duration: float = 0.1  # Dormir entre operaciones
 
@@ -31,6 +35,10 @@ class ResourceManager:
         self.limits = ResourceLimits(
             max_cpu_percent=resource_config.get('max_cpu_percent', 25.0),
             target_cpu_percent=resource_config.get('target_cpu_percent', 20.0),
+            max_ram_gb=resource_config.get('max_ram_gb', 8.0),
+            target_ram_gb=resource_config.get('target_ram_gb', 6.0),
+            available_cores=resource_config.get('available_cores', 6),
+            available_threads=resource_config.get('available_threads', 12),
             check_interval=resource_config.get('check_interval', 1.0),
             sleep_duration=resource_config.get('sleep_duration', 0.1),
         )
@@ -39,6 +47,7 @@ class ResourceManager:
         self.monitoring = False
         self.monitor_thread: Optional[threading.Thread] = None
         self.current_cpu_usage = 0.0
+        self.current_ram_usage_gb = 0.0
         self.operation_count = 0
         self.last_check = datetime.now()
     
@@ -66,9 +75,17 @@ class ResourceManager:
                 cpu_percent = self.process.cpu_percent(interval=0.1)
                 self.current_cpu_usage = cpu_percent
                 
-                # Si excede el límite, registrar advertencia
+                # Obtener uso de RAM
+                memory_info = self.process.memory_info()
+                ram_gb = memory_info.rss / (1024 ** 3)  # Convertir bytes a GB
+                self.current_ram_usage_gb = ram_gb
+                
+                # Si excede límites, registrar advertencia
                 if cpu_percent > self.limits.max_cpu_percent:
                     print(f"⚠️  Uso de CPU alto: {cpu_percent:.1f}% (límite: {self.limits.max_cpu_percent}%)")
+                
+                if ram_gb > self.limits.max_ram_gb:
+                    print(f"⚠️  Uso de RAM alto: {ram_gb:.2f}GB (límite: {self.limits.max_ram_gb}GB)")
                 
                 time.sleep(self.limits.check_interval)
             except Exception as e:
@@ -78,13 +95,25 @@ class ResourceManager:
     def check_and_throttle(self) -> None:
         """Verifica uso de recursos y aplica throttling si es necesario"""
         current_cpu = self.process.cpu_percent(interval=0.1)
+        memory_info = self.process.memory_info()
+        current_ram_gb = memory_info.rss / (1024 ** 3)
         
-        # Si estamos por encima del objetivo, aplicar throttling
+        # Si estamos por encima del objetivo de CPU, aplicar throttling
         if current_cpu > self.limits.target_cpu_percent:
             # Calcular tiempo de espera proporcional al exceso
             excess = current_cpu - self.limits.target_cpu_percent
             sleep_time = self.limits.sleep_duration * (1 + excess / 10)
             time.sleep(sleep_time)
+        
+        # Si estamos por encima del objetivo de RAM, intentar liberar memoria
+        if current_ram_gb > self.limits.target_ram_gb:
+            # Forzar garbage collection si es posible
+            import gc
+            gc.collect()
+            
+            # Si aún excede, aplicar throttling más agresivo
+            if self.process.memory_info().rss / (1024 ** 3) > self.limits.target_ram_gb:
+                time.sleep(self.limits.sleep_duration * 2)
     
     def rate_limit_operation(self) -> None:
         """Aplica rate limiting entre operaciones"""
@@ -101,13 +130,25 @@ class ResourceManager:
         try:
             cpu_percent = self.process.cpu_percent(interval=0.1)
             memory_info = self.process.memory_info()
+            ram_gb = memory_info.rss / (1024 ** 3)
             
             return {
                 'cpu_percent': cpu_percent,
                 'memory_mb': memory_info.rss / 1024 / 1024,
+                'memory_gb': ram_gb,
                 'operations': self.operation_count,
-                'within_limits': cpu_percent <= self.limits.max_cpu_percent,
-                'target_met': cpu_percent <= self.limits.target_cpu_percent,
+                'within_limits': (
+                    cpu_percent <= self.limits.max_cpu_percent and
+                    ram_gb <= self.limits.max_ram_gb
+                ),
+                'target_met': (
+                    cpu_percent <= self.limits.target_cpu_percent and
+                    ram_gb <= self.limits.target_ram_gb
+                ),
+                'available_cores': self.limits.available_cores,
+                'available_threads': self.limits.available_threads,
+                'max_ram_gb': self.limits.max_ram_gb,
+                'max_cpu_percent': self.limits.max_cpu_percent,
             }
         except Exception as e:
             return {
@@ -128,6 +169,9 @@ class ResourceManager:
         print(f"\n{status} Recursos del Agente:")
         print(f"  CPU: {stats['cpu_percent']:.1f}% (límite: {self.limits.max_cpu_percent}%)")
         print(f"  {target_status} Objetivo: {stats['cpu_percent']:.1f}% (target: {self.limits.target_cpu_percent}%)")
+        print(f"  RAM: {stats.get('memory_gb', stats['memory_mb']/1024):.2f}GB (límite: {self.limits.max_ram_gb}GB)")
+        print(f"  Núcleos disponibles: {self.limits.available_cores}")
+        print(f"  Hilos disponibles: {self.limits.available_threads}")
         print(f"  Memoria: {stats['memory_mb']:.1f} MB")
         print(f"  Operaciones: {stats['operations']}")
 

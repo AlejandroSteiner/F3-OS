@@ -11,6 +11,7 @@ from urllib.parse import urlparse, parse_qs
 import threading
 
 from .gui_integration import GUIIntegration
+from .activity_stream import get_activity_stream
 
 
 class AssistantHTTPHandler(BaseHTTPRequestHandler):
@@ -35,6 +36,10 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
             self._handle_conversation()
         elif path == '/assistant/suggestions':
             self._handle_suggestions()
+        elif path == '/api/activities' or path == '/activities':
+            self._handle_activities()
+        elif path == '/api/activities/stream':
+            self._handle_activities_stream()
         else:
             self._send_error(404, "Not Found")
     
@@ -211,6 +216,61 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
         """Obtiene sugerencias"""
         suggestions = self.gui.get_suggestions()
         self._send_json(200, {'suggestions': suggestions})
+    
+    def _handle_activities(self):
+        """Obtiene actividades recientes del agente"""
+        query_params = parse_qs(urlparse(self.path).query)
+        limit = int(query_params.get('limit', [50])[0])
+        
+        stream = get_activity_stream()
+        activities = stream.get_recent_activities(limit=limit)
+        
+        self._send_json(200, {
+            'activities': activities,
+            'count': len(activities)
+        })
+    
+    def _handle_activities_stream(self):
+        """Stream de actividades en tiempo real (Server-Sent Events)"""
+        self.send_response(200)
+        self.send_header('Content-Type', 'text/event-stream')
+        self.send_header('Cache-Control', 'no-cache')
+        self.send_header('Connection', 'keep-alive')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.end_headers()
+        
+        stream = get_activity_stream()
+        
+        def send_activity(activity):
+            """Envía actividad al cliente"""
+            try:
+                data = json.dumps(activity.to_dict())
+                self.wfile.write(f"data: {data}\n\n".encode('utf-8'))
+                self.wfile.flush()
+            except Exception as e:
+                logger.error(f"Error enviando actividad: {e}")
+        
+        # Suscribirse al stream
+        stream.subscribe(send_activity)
+        
+        # Enviar actividades existentes
+        existing = stream.get_recent_activities(limit=20)
+        for activity_dict in existing:
+            try:
+                self.wfile.write(f"data: {json.dumps(activity_dict)}\n\n".encode('utf-8'))
+                self.wfile.flush()
+            except:
+                break
+        
+        # Mantener conexión abierta (simplificado - en producción usar threading)
+        import time
+        try:
+            while True:
+                time.sleep(1)
+                self.wfile.write(b': keepalive\n\n')
+                self.wfile.flush()
+        except:
+            stream.unsubscribe(send_activity)
     
     def _handle_open(self):
         """Abre el asistente"""

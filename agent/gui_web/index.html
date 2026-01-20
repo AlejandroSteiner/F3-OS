@@ -415,6 +415,106 @@
             border: 1px solid rgba(255, 0, 0, 0.3);
             box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
         }
+        
+        .activities-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .activities-container h3 {
+            color: #00ff41;
+            margin-bottom: 15px;
+            font-size: 18px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .activities-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .activity-item {
+            background: rgba(0, 255, 65, 0.05);
+            border-left: 3px solid rgba(0, 255, 65, 0.5);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            animation: slideIn 0.3s ease-out;
+            transition: all 0.3s;
+        }
+        
+        .activity-item:hover {
+            background: rgba(0, 255, 65, 0.1);
+            border-left-color: #00ff41;
+        }
+        
+        .activity-item.running {
+            border-left-color: #00aaff;
+            background: rgba(0, 170, 255, 0.05);
+        }
+        
+        .activity-item.success {
+            border-left-color: #00ff41;
+            background: rgba(0, 255, 65, 0.1);
+        }
+        
+        .activity-item.error {
+            border-left-color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+        
+        .activity-item.warning {
+            border-left-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.1);
+        }
+        
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        
+        .activity-title {
+            color: #00ff41;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .activity-time {
+            color: rgba(0, 255, 65, 0.6);
+            font-size: 11px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .activity-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .activity-placeholder {
+            color: rgba(0, 255, 65, 0.4);
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -476,6 +576,13 @@
                 <button onclick="sendMessage()">Enviar</button>
             </div>
         </div>
+        
+        <div class="activities-container">
+            <h3>📊 Actividades del Agente</h3>
+            <div class="activities-list" id="activitiesList">
+                <div class="activity-placeholder">Esperando actividades...</div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -488,6 +595,10 @@
         loadStatus();
         setInterval(loadStatus, 5000); // Actualizar cada 5 segundos
         setInterval(updateLifeIndicator, 1000); // Actualizar indicador cada segundo
+        
+        // Conectar al stream de actividades
+        connectActivityStream();
+        loadRecentActivities();
         
         // Permitir Enter para enviar
         document.getElementById('userInput').addEventListener('keypress', function(e) {
@@ -591,6 +702,82 @@
         
         // Inicializar indicador
         updateLifeIndicator();
+        
+        // Funciones para actividades
+        function connectActivityStream() {
+            const eventSource = new EventSource(`${API_URL}/api/activities/stream`);
+            
+            eventSource.onmessage = function(event) {
+                try {
+                    const activity = JSON.parse(event.data);
+                    addActivity(activity);
+                } catch (error) {
+                    console.error('Error parseando actividad:', error);
+                }
+            };
+            
+            eventSource.onerror = function(error) {
+                console.error('Error en stream de actividades:', error);
+                // Reintentar después de 5 segundos
+                setTimeout(connectActivityStream, 5000);
+            };
+        }
+        
+        async function loadRecentActivities() {
+            try {
+                const response = await fetch(`${API_URL}/api/activities?limit=20`);
+                const data = await response.json();
+                
+                const list = document.getElementById('activitiesList');
+                list.innerHTML = '';
+                
+                if (data.activities && data.activities.length > 0) {
+                    data.activities.forEach(activity => {
+                        addActivity(activity);
+                    });
+                } else {
+                    list.innerHTML = '<div class="activity-placeholder">Esperando actividades...</div>';
+                }
+            } catch (error) {
+                console.error('Error cargando actividades:', error);
+            }
+        }
+        
+        function addActivity(activity) {
+            const list = document.getElementById('activitiesList');
+            
+            // Remover placeholder si existe
+            const placeholder = list.querySelector('.activity-placeholder');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            const activityDiv = document.createElement('div');
+            activityDiv.className = `activity-item ${activity.status || 'running'}`;
+            
+            const time = new Date(activity.timestamp);
+            const timeStr = time.toLocaleTimeString('es-ES', { 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            
+            activityDiv.innerHTML = `
+                <div class="activity-header">
+                    <div class="activity-title">${activity.title || 'Actividad'}</div>
+                    <div class="activity-time">${timeStr}</div>
+                </div>
+                ${activity.description ? `<div class="activity-description">${activity.description}</div>` : ''}
+            `;
+            
+            // Insertar al inicio
+            list.insertBefore(activityDiv, list.firstChild);
+            
+            // Limitar a 50 actividades
+            while (list.children.length > 50) {
+                list.removeChild(list.lastChild);
+            }
+        }
     </script>
 </body>
 </html>
