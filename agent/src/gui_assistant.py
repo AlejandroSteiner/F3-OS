@@ -122,6 +122,10 @@ class GUIAssistant:
     
     def _process_message_internal(self, user_input: str, context: Optional[Dict] = None) -> str:
         """Procesa mensaje internamente"""
+        # Registrar actividad de procesamiento
+        from .activity_stream import log_thinking
+        log_thinking(f"Procesando consulta del usuario: {user_input[:50]}...")
+        
         # Guardar mensaje del usuario
         user_message = Message(
             role="user",
