@@ -152,6 +152,33 @@ Esto generará `kernel.bin` en la raíz del proyecto.
 - ✅ Ciclo de fases: Lógico → Ilógico → Síntesis → Perfecto
 - ✅ Multiboot header para bootloaders
 - ✅ Scripts de build y ejecución
+- ✅ **Agente Gobernante AI** con interfaz GUI completa
+
+## 🤖 Agente Gobernante F3-OS
+
+F3-OS incluye un agente AI especializado que gobierna el desarrollo del proyecto, manteniendo coherencia con el modelo F3. El agente incluye una interfaz web completa con diseño futurista.
+
+### Interfaz del Asistente
+
+![F3-OS Assistant Interface](agent/gui_web/screenshot.png)
+
+*Interfaz del asistente con indicador de vida del agente (arriba derecha), panel de estado en tiempo real, y chat interactivo. Diseño futurista estilo Star Wars/Fórmula 1.*
+
+**Características de la Interfaz:**
+- 🟢 **Indicador de Vida del Agente**: Reloj circular estilo F1/Star Wars que muestra tiempo activo
+- 📊 **Panel de Estado**: Métricas en tiempo real (fase, entropía, perfection score, CPU)
+- 💬 **Chat Interactivo**: Conversación en tiempo real con el asistente
+- 🎨 **Tema Futurista**: Diseño oscuro con acentos verdes neón
+- 📚 **Base de Conocimiento Completa**: Acceso a toda la documentación del proyecto
+
+**Para usar el asistente:**
+```bash
+cd agent
+./run.sh gui-server
+# Luego abre: http://localhost:8080
+```
+
+Ver [agent/README.md](agent/README.md) para más información sobre el agente.
 
 **Problemas Conocidos**:
 - ⚠️ GRUB puede tener problemas detectando el Multiboot header (usar opciones de debugging)
