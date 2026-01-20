@@ -170,6 +170,12 @@ def start_gui_server(config: Dict, data_dir: Path, port: int = 8080):
     resource_manager = ResourceManager(config)
     resource_manager.start_monitoring()
     
+    # Agregar project_root al config si no está presente
+    if 'project_root' not in config:
+        # Calcular project_root: agent/src/main.py -> agent/ -> f3-os/
+        project_root = Path(__file__).resolve().parent.parent.parent
+        config['project_root'] = str(project_root)
+    
     from .gui_integration import GUIIntegration
     gui = GUIIntegration(governance, resource_manager, config)
     

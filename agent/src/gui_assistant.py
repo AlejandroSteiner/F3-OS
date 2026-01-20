@@ -9,6 +9,11 @@ from typing import Dict, List, Optional, Callable
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+import logging
+
+from .project_analyzer import ProjectAnalyzer
+
+logger = logging.getLogger(__name__)
 
 
 class AssistantPersonality(Enum):
@@ -57,6 +62,10 @@ class GUIAssistant:
             system_phase='logical',
             context_aware=True
         )
+        
+        # Analizador de proyecto
+        project_root = config.get('project_root', None)
+        self.project_analyzer = ProjectAnalyzer(project_root=project_root)
         
         # Respuestas predefinidas
         self._init_responses()
@@ -137,6 +146,16 @@ class GUIAssistant:
         if any(word in input_lower for word in ['hola', 'hi', 'hello', 'saludo']):
             return 'greeting'
         
+        # Preguntas sobre reglas (alta prioridad)
+        if any(word in input_lower for word in ['reglas', 'rules', 'tus reglas', 'las reglas', 'reglas del proyecto']):
+            return 'rules'
+        
+        # Explicar desde cero / analizar archivos
+        if any(phrase in input_lower for phrase in ['explicame desde cero', 'explica desde cero', 'desde cero', 
+                                                     'analiza', 'analizar', 'lee los archivos', 'lee archivos',
+                                                     'comprender el proyecto', 'entender el proyecto']):
+            return 'explain_from_scratch'
+        
         # Preguntas sobre F3
         if any(word in input_lower for word in ['f3', 'modelo', 'hilos', 'embudo']):
             return 'f3_model'
@@ -169,50 +188,110 @@ class GUIAssistant:
         if intent == 'greeting':
             return f"¡Hola {self.state.user_name}! ¿En qué puedo ayudarte hoy?"
         
+        elif intent == 'rules':
+            # Obtener todas las reglas del proyecto
+            logger.info("Usuario pregunta sobre reglas - analizando proyecto...")
+            rules = self.project_analyzer.get_rules()
+            if rules and len(rules) > 100:
+                # Resumir si es muy largo
+                rules_lines = rules.split('\n')
+                if len(rules_lines) > 100:
+                    response = "📋 **Reglas del Proyecto F3-OS:**\n\n"
+                    response += '\n'.join(rules_lines[:100])
+                    response += "\n\n... (hay más reglas. ¿Quieres que profundice en alguna específica?)"
+                else:
+                    response = "📋 **Reglas del Proyecto F3-OS:**\n\n" + rules
+            else:
+                response = "📋 **Reglas del Proyecto F3-OS:**\n\n" + (rules if rules else "No se encontraron reglas documentadas.")
+            return response
+        
+        elif intent == 'explain_from_scratch':
+            # Explicación completa desde cero
+            logger.info("Usuario pide explicación desde cero - analizando proyecto...")
+            explanation = self.project_analyzer.explain_from_scratch()
+            if explanation:
+                response = "📚 **Explicación Completa de F3-OS desde Cero:**\n\n"
+                response += explanation
+                response += "\n\n¿Hay algo específico que quieras que profundice?"
+            else:
+                response = "Estoy analizando los archivos del proyecto para darte una explicación completa. Por favor, intenta de nuevo en un momento."
+            return response
+        
         elif intent == 'f3_model':
-            response = self.help_responses.get('f3_model', '')
+            # Usar analizador para obtener explicación detallada
+            f3_explanation = self.project_analyzer.get_f3_model_explanation()
+            if f3_explanation:
+                response = "🔷 **Modelo F3:**\n\n" + f3_explanation
+            else:
+                response = self.help_responses.get('f3_model', '')
+            
             if self.state.context_aware:
                 response += f"\n\nActualmente el sistema está en fase {self.state.system_phase.upper()}."
             return response
         
         elif intent == 'phases':
-            response = self.help_responses.get('phases', '')
+            # Obtener explicación detallada de fases
+            phases_section = self.project_analyzer.get_section('reglas', 'el ciclo de 4 fases')
+            if phases_section:
+                response = "🔄 **Ciclo de 4 Fases:**\n\n" + phases_section
+            else:
+                response = self.help_responses.get('phases', '')
+            
             if context and 'current_phase' in context:
-                response += f"\n\nFase actual: {context['current_phase'].upper()}"
+                response += f"\n\n**Fase actual:** {context['current_phase'].upper()}"
             return response
         
         elif intent == 'navigation':
             return self.help_responses.get('navigation', 'Puedo ayudarte a navegar. ¿A dónde quieres ir?')
         
         elif intent == 'development':
-            return self.help_responses.get('development', 'Soy el agente gobernante. ¿Tienes alguna pregunta sobre desarrollo?')
+            # Obtener información sobre desarrollo
+            contributing_section = self.project_analyzer.get_section('contributing', 'reglas fundamentales')
+            if contributing_section:
+                response = "💻 **Desarrollo en F3-OS:**\n\n"
+                response += contributing_section
+                response += "\n\nComo agente gobernante, evalúo PRs y mantengo coherencia con el modelo F3."
+            else:
+                response = self.help_responses.get('development', 'Soy el agente gobernante. ¿Tienes alguna pregunta sobre desarrollo?')
+            return response
         
         elif intent == 'system_status':
             status = self.governance_core.get_status()
-            response = f"📊 Estado del Sistema F3-OS:\n"
-            response += f"- Fase: {status['phase'].upper()}\n"
-            response += f"- Entropía: {status['entropy']}/255\n"
-            response += f"- Perfection Score: {status['perfection_score']}\n"
-            response += f"- Ciclos: {status['cycle_count']}\n"
+            response = f"📊 **Estado del Sistema F3-OS:**\n\n"
+            response += f"- **Fase:** {status['phase'].upper()}\n"
+            response += f"- **Entropía:** {status['entropy']}/255\n"
+            response += f"- **Perfection Score:** {status['perfection_score']}\n"
+            response += f"- **Ciclos:** {status['cycle_count']}\n"
             
             if 'resources' in status:
                 cpu = status['resources'].get('cpu_percent', 0)
-                response += f"- CPU del agente: {cpu:.1f}%\n"
+                response += f"- **CPU del agente:** {cpu:.1f}%\n"
             
             return response
         
         elif intent == 'help':
-            response = "🤖 Puedo ayudarte con:\n"
-            response += "- Explicar el modelo F3\n"
-            response += "- Navegar por el sistema\n"
-            response += "- Ver estado del sistema\n"
-            response += "- Preguntas sobre desarrollo\n"
-            response += "- Cualquier otra cosa relacionada con F3-OS\n\n"
+            response = "🤖 **Puedo ayudarte con:**\n\n"
+            response += "- 📋 Explicar las reglas del proyecto\n"
+            response += "- 🔷 Explicar el modelo F3\n"
+            response += "- 🔄 Explicar el ciclo de fases\n"
+            response += "- 📊 Ver estado del sistema\n"
+            response += "- 💻 Preguntas sobre desarrollo\n"
+            response += "- 📚 Explicación completa desde cero\n"
+            response += "- 🧭 Navegar por el sistema\n\n"
             response += "¿Qué te gustaría saber?"
             return response
         
         else:  # general
-            return self._generate_general_response(user_input)
+            # Intentar búsqueda en archivos
+            search_results = self.project_analyzer.search_in_files(user_input)
+            if search_results:
+                response = f"🔍 **Encontré información relacionada con tu pregunta:**\n\n"
+                for filename, content in search_results[:3]:  # Máximo 3 resultados
+                    response += f"**En {filename}:**\n{content[:500]}...\n\n"
+                response += "¿Quieres que profundice en algún aspecto específico?"
+            else:
+                return self._generate_general_response(user_input)
+            return response
     
     def _generate_general_response(self, user_input: str) -> str:
         """Genera respuesta general conversacional"""
@@ -253,6 +332,8 @@ class GUIAssistant:
     def get_suggestions(self) -> List[str]:
         """Obtiene sugerencias de preguntas/comandos"""
         suggestions = [
+            "¿Cuáles son tus reglas?",
+            "Explicame desde cero",
             "¿Qué es el modelo F3?",
             "¿En qué fase está el sistema?",
             "Muéstrame el estado del sistema",
