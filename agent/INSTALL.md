@@ -40,34 +40,51 @@ github:
 
 ## Uso Básico
 
-### Evaluar un PR específico
+### Método 1: Usar script de ejecución (Recomendado)
 
 ```bash
-python -m src.main evaluate-pr --pr 123
+cd agent
+./run.sh evaluate-pr --pr 123
+./run.sh monitor
+./run.sh status
+./run.sh cycle
+./run.sh gui-server
 ```
 
-### Monitorear todos los PRs abiertos
+### Método 2: Ejecutar directamente
 
 ```bash
-python -m src.main monitor
+cd agent
+python3 run_agent.py evaluate-pr --pr 123
+python3 run_agent.py monitor
+python3 run_agent.py status
+python3 run_agent.py cycle
+python3 run_agent.py gui-server
 ```
 
-### Ver estado del agente
+### Método 3: Como módulo Python
 
 ```bash
-python -m src.main status
+cd agent
+python3 -m src.main evaluate-pr --pr 123
+python3 -m src.main monitor
+python3 -m src.main status
+python3 -m src.main cycle
+python3 -m src.main gui-server
 ```
 
-### Ejecutar ciclo completo
+### Comandos Disponibles
 
-```bash
-python -m src.main cycle
-```
+- `evaluate-pr --pr N`: Evalúa un PR específico
+- `monitor`: Monitorea todos los PRs abiertos
+- `status`: Muestra estado del agente
+- `cycle`: Ejecuta ciclo completo
+- `gui-server`: Inicia servidor GUI del asistente
 
 ### Modo dry-run (sin hacer cambios)
 
 ```bash
-python -m src.main evaluate-pr --pr 123 --dry-run
+./run.sh evaluate-pr --pr 123 --dry-run
 ```
 
 ## Integración con GitHub Actions (Opcional)
