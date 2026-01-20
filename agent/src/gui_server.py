@@ -291,12 +291,7 @@ class GUIServer:
             print(f"📱 Abre en tu navegador: http://localhost:{self.port}")
             print(f"💬 Interfaz web disponible para chatear con el asistente")
             print("")
-            while self.running:
-                try:
-                    self.server.handle_request()
-                except Exception as e:
-                    if self.running:  # Solo loguear si aún está corriendo
-                        print(f"Error en servidor: {e}")
+            self.server.serve_forever()
         
         self.server_thread = threading.Thread(target=run_server, daemon=True)
         self.server_thread.start()
