@@ -314,3 +314,4 @@ Este proyecto está licenciado bajo la Licencia GPL-3.0 - ver el archivo [LICENS
 **⚠️ Advertencia**: Este es un proyecto experimental. No use en producción. Úsalo bajo tu propio riesgo.
 
 **⭐ Si te gusta este proyecto, considera darle una estrella en GitHub!**
+DONATIONS - PEPE ETH CONTRACT: 0xf700d6d8fe58421e5937b8a64696775e1449242e
