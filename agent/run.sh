@@ -21,11 +21,17 @@ if [ ! -f config/config.yaml ]; then
 fi
 
 # Verificar que las dependencias están instaladas
-if ! python3 -c "import yaml" 2>/dev/null; then
+if ! python3 -c "import yaml, github, psutil" 2>/dev/null; then
     echo "⚠️  Advertencia: Dependencias no instaladas"
     echo "Instalando dependencias..."
     pip3 install -r requirements.txt
-    echo "✅ Dependencias instaladas"
+    if [ $? -eq 0 ]; then
+        echo "✅ Dependencias instaladas"
+    else
+        echo "❌ Error instalando dependencias"
+        echo "Intenta manualmente: pip3 install -r requirements.txt"
+        exit 1
+    fi
     echo ""
 fi
 
