@@ -1,4 +1,5 @@
 // GUI Module - Interfaz gráfica completa de F3-OS
+extern crate alloc;
 // Basada en separación de consultas de procesos y drivers de AI
 
 pub mod query_processor;
@@ -28,6 +29,8 @@ pub fn init() {
 pub fn process_user_query(query: &str) {
     unsafe {
         if let Some(ref mut processor) = QUERY_PROCESSOR {
+            extern crate alloc;
+            use alloc::string::ToString;
             if let Some(query_id) = processor.create_query_process(query.to_string()) {
                 use crate::vga;
                 vga::print("[GUI] Query #");

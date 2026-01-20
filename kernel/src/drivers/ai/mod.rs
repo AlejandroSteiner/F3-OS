@@ -1,4 +1,5 @@
 // AI Drivers Module - Drivers de AI de última tecnología
+extern crate alloc;
 
 pub mod language_model;
 pub mod query_processor;

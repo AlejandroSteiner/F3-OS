@@ -1,4 +1,5 @@
 // GUI Renderer - Renderizador de interfaz gráfica
+extern crate alloc;
 // Basado en separación de consultas y drivers de AI
 
 use alloc::vec::Vec;

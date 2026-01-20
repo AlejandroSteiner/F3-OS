@@ -13,6 +13,10 @@ mod allocator;
 mod gui;
 mod drivers;
 
+// Re-exportar módulos de lib.rs para uso en main
+pub use gui;
+pub use drivers;
+
 use core::panic::PanicInfo;
 
 #[no_mangle]

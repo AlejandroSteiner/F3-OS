@@ -1,4 +1,5 @@
 // GPU Driver Module - Driver de GPU para renderizado de última tecnología
+extern crate alloc;
 
 /// Driver de GPU para renderizado
 pub struct GPURenderDriver {

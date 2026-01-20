@@ -1,4 +1,5 @@
 // Query Process - Proceso separado para cada consulta del usuario
+extern crate alloc;
 // Cada consulta tiene su propio contexto y AI Driver
 
 use alloc::string::String;

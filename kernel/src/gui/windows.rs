@@ -1,4 +1,5 @@
 // Windows System - Sistema de ventanas para GUI
+extern crate alloc;
 // Cada consulta puede tener su propia ventana
 
 use alloc::vec::Vec;

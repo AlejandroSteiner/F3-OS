@@ -1,4 +1,5 @@
 // AI Driver - Driver de AI para procesamiento de consultas
+extern crate alloc;
 // Integrado con el modelo F3
 
 use alloc::vec::Vec;

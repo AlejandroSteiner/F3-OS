@@ -1,4 +1,5 @@
 // AI Query Processor - Procesador de consultas con AI
+extern crate alloc;
 
 use super::language_model::LanguageModel;
 

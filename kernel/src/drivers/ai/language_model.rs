@@ -1,4 +1,5 @@
 // Language Model Driver - Modelo de lenguaje para procesamiento de consultas
+extern crate alloc;
 
 use alloc::vec::Vec;
 use alloc::string::String;

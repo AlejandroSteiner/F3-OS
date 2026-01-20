@@ -1,14 +1,17 @@
 // Query Processor - Separador de consultas de procesos
+extern crate alloc;
 // Cada consulta del usuario crea un proceso separado
 
+extern crate alloc;
 use alloc::vec::Vec;
 use alloc::string::String;
+
 use super::query_process::QueryProcess;
 
 /// Procesador de consultas que separa cada consulta en un proceso independiente
 pub struct QueryProcessor {
     /// Pool de procesos de consulta activos
-    query_processes: [Option<QueryProcess>; 32], // Máximo 32 procesos simultáneos
+    query_processes: Vec<Option<QueryProcess>>, // Máximo 32 procesos simultáneos
     /// Contador de consultas
     query_counter: u64,
     /// Próximo índice disponible
@@ -18,8 +21,12 @@ pub struct QueryProcessor {
 impl QueryProcessor {
     /// Crea un nuevo procesador de consultas
     pub fn new() -> Self {
+        let mut processes = Vec::new();
+        for _ in 0..32 {
+            processes.push(None);
+        }
         Self {
-            query_processes: vec![None; 32],
+            query_processes: processes,
             query_counter: 0,
             next_index: 0,
         }

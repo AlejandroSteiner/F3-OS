@@ -1,4 +1,5 @@
 // AI Response Generator - Generador de respuestas con AI
+extern crate alloc;
 
 use super::language_model::{LanguageModel, ProcessedQuery};
 
