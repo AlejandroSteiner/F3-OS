@@ -20,10 +20,11 @@
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             padding: 20px;
             position: relative;
-            overflow: hidden;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
         
         body::before {
@@ -67,6 +68,8 @@
             gap: 20px;
             position: relative;
             backdrop-filter: blur(10px);
+            margin: 20px auto;
+            min-height: auto;
         }
         
         .container::before {
@@ -421,8 +424,28 @@
             border-radius: 12px;
             padding: 20px;
             border: 1px solid rgba(0, 255, 65, 0.2);
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
+            overflow-x: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .activities-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .activities-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        .activities-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 65, 0.5);
+            border-radius: 4px;
+        }
+        
+        .activities-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 65, 0.7);
         }
         
         .activities-container h3 {
