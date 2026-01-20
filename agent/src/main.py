@@ -31,72 +31,103 @@ def evaluate_pr(pr_number: int, config: Dict, data_dir: Path, dry_run: bool = Fa
     
     # Inicializar componentes
     governance = GovernanceCore(config, data_dir)
-    github = GitHubIntegration(config)
     
-    # Obtener datos del PR (con throttling)
     try:
-        pr_data = github.get_pr(pr_number, governance.resource_manager)
-    except Exception as e:
-        print(f"❌ Error obteniendo PR: {e}")
-        return
-    
-    print(f"📄 PR: {pr_data['title']}")
-    print(f"👤 Autor: {pr_data['user']}")
-    print(f"📁 Archivos: {len(pr_data['files'])}")
-    
-    # Evaluar
-    evaluation = governance.evaluate_pr(pr_data)
-    
-    # Mostrar resultados
-    print("\n" + "="*60)
-    print(evaluation['feedback'])
-    print("="*60)
-    
-    decision = evaluation['decision']
-    print(f"\n🎯 Decisión: {decision['action'].upper()}")
-    print(f"📝 Razón: {decision['reason'][:200]}...")
-    
-    # Aplicar decisión (si no es dry-run)
-    if not dry_run:
-        if decision['action'] == 'approve':
-            if decision.get('auto', False):
-                print("✅ Auto-aprobando PR...")
-                github.approve_pr(pr_number, evaluation['feedback'])
-            else:
-                print("✅ Aprobando PR (requiere revisión humana)...")
+        github = GitHubIntegration(config)
+        
+        # Obtener datos del PR (con throttling)
+        try:
+            pr_data = github.get_pr(pr_number, governance.resource_manager)
+        except Exception as e:
+            print(f"❌ Error obteniendo PR: {e}")
+            return
+        
+        print(f"📄 PR: {pr_data['title']}")
+        print(f"👤 Autor: {pr_data['user']}")
+        print(f"📁 Archivos: {len(pr_data['files'])}")
+        
+        # Evaluar
+        evaluation = governance.evaluate_pr(pr_data)
+        
+        # Mostrar resultados
+        print("\n" + "="*60)
+        print(evaluation['feedback'])
+        print("="*60)
+        
+        decision = evaluation['decision']
+        print(f"\n🎯 Decisión: {decision['action'].upper()}")
+        print(f"📝 Razón: {decision['reason'][:200]}...")
+        
+        # Aplicar decisión (si no es dry-run)
+        if not dry_run:
+            if decision['action'] == 'approve':
+                if decision.get('auto', False):
+                    print("✅ Auto-aprobando PR...")
+                    github.approve_pr(pr_number, evaluation['feedback'])
+                else:
+                    print("✅ Aprobando PR (requiere revisión humana)...")
+                    github.comment_on_pr(pr_number, evaluation['feedback'])
+            elif decision['action'] == 'request_changes':
+                print("🔄 Solicitando cambios...")
+                github.request_changes(pr_number, evaluation['feedback'])
+            elif decision['action'] == 'reject':
+                print("❌ Rechazando PR...")
                 github.comment_on_pr(pr_number, evaluation['feedback'])
-        elif decision['action'] == 'request_changes':
-            print("🔄 Solicitando cambios...")
-            github.request_changes(pr_number, evaluation['feedback'])
-        elif decision['action'] == 'reject':
-            print("❌ Rechazando PR...")
-            github.comment_on_pr(pr_number, evaluation['feedback'])
-    else:
-        print("\n🔍 DRY RUN - No se aplicaron cambios en GitHub")
+        else:
+            print("\n🔍 DRY RUN - No se aplicaron cambios en GitHub")
+    except ValueError as e:
+        if "token" in str(e).lower():
+            print("⚠️  GitHub no configurado")
+            print("")
+            print("El agente funciona en modo local.")
+            print("Para evaluar PRs, configura GitHub con: ./setup_config.sh")
+            print("")
+            print("Funcionalidades disponibles sin GitHub:")
+            print("  ✅ Estado del agente: ./run.sh status")
+            print("  ✅ Servidor GUI: ./run.sh gui-server")
+            print("")
+        else:
+            raise
 
 
 def monitor_prs(config: Dict, data_dir: Path, dry_run: bool = False):
     """Monitorea PRs abiertos automáticamente"""
     print("👀 Monitoreando PRs abiertos...")
     
-    github = GitHubIntegration(config)
-    governance = GovernanceCore(config, data_dir)
-    
-    pr_numbers = github.get_open_prs()
-    print(f"📋 Encontrados {len(pr_numbers)} PRs abiertos")
-    
-    # Mostrar límites de recursos
-    governance.resource_manager.print_resource_stats()
-    print()
-    
-    for pr_number in pr_numbers:
-        print(f"\n{'='*60}")
-        evaluate_pr(pr_number, config, data_dir, dry_run)
-        print(f"{'='*60}\n")
+    try:
+        github = GitHubIntegration(config)
+        governance = GovernanceCore(config, data_dir)
         
-        # Mostrar uso de recursos después de cada PR
+        pr_numbers = github.get_open_prs()
+        print(f"📋 Encontrados {len(pr_numbers)} PRs abiertos")
+        
+        # Mostrar límites de recursos
         governance.resource_manager.print_resource_stats()
         print()
+        
+        for pr_number in pr_numbers:
+            print(f"\n{'='*60}")
+            evaluate_pr(pr_number, config, data_dir, dry_run)
+            print(f"{'='*60}\n")
+            
+            # Mostrar uso de recursos después de cada PR
+            governance.resource_manager.print_resource_stats()
+            print()
+    except ValueError as e:
+        if "token" in str(e).lower():
+            print("⚠️  GitHub no configurado - Modo local activado")
+            print("")
+            print("El agente funciona en modo local sin GitHub:")
+            print("  ✅ Puedes ver el estado: ./run.sh status")
+            print("  ✅ Puedes usar el servidor GUI: ./run.sh gui-server")
+            print("")
+            print("Para habilitar GitHub más tarde:")
+            print("  ./setup_config.sh")
+            print("")
+            governance = GovernanceCore(config, data_dir)
+            governance.resource_manager.print_resource_stats()
+        else:
+            raise
 
 
 def show_status(config: Dict, data_dir: Path):
@@ -120,7 +151,12 @@ def show_status(config: Dict, data_dir: Path):
 def run_cycle(config: Dict, data_dir: Path):
     """Ejecuta un ciclo completo de desarrollo"""
     print("🔄 Ejecutando ciclo de desarrollo...")
-    monitor_prs(config, data_dir, dry_run=False)
+    try:
+        monitor_prs(config, data_dir, dry_run=False)
+    except ValueError as e:
+        if "token" in str(e).lower():
+            print("")
+            print("ℹ️  Continuando en modo local...")
     show_status(config, data_dir)
 
 
@@ -211,10 +247,16 @@ def main():
         if not args.pr:
             print("Error: --pr es requerido para evaluate-pr")
             sys.exit(1)
-        evaluate_pr(args.pr, config, args.data_dir, args.dry_run)
+        try:
+            evaluate_pr(args.pr, config, args.data_dir, args.dry_run)
+        except ValueError:
+            pass  # Ya se mostró el mensaje en evaluate_pr
     
     elif args.command == 'monitor':
-        monitor_prs(config, args.data_dir, args.dry_run)
+        try:
+            monitor_prs(config, args.data_dir, args.dry_run)
+        except ValueError:
+            pass  # Ya se mostró el mensaje en monitor_prs
     
     elif args.command == 'status':
         show_status(config, args.data_dir)
