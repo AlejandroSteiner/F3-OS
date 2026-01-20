@@ -75,10 +75,15 @@ echo ""
 # -name "F3-OS": Nombre identificador
 # -nodefaults: Sin dispositivos por defecto (máxima seguridad)
 
+# Configuración de red para acceso al servidor GUI del agente
+# User networking permite acceso al host en 10.0.2.2
+NETWORK_ARGS="-netdev user,id=net0,hostfwd=tcp::8080-:8080 -device rtl8139,netdev=net0"
+
 # Intentar primero con -kernel (boot directo Multiboot)
 # Si falla, intentar con ISO si existe
 if [ -f f3os.iso ]; then
     echo -e "${YELLOW}Usando ISO booteable...${NC}"
+    echo -e "${GREEN}🌐 Red habilitada: F3-OS puede acceder al servidor GUI en http://10.0.2.2:8080${NC}"
     qemu-system-x86_64 \
       -cdrom f3os.iso \
       -display gtk \
@@ -91,9 +96,11 @@ if [ -f f3os.iso ]; then
       -serial stdio \
       -name "F3-OS" \
       -nodefaults \
+      $NETWORK_ARGS \
       "$@"
 else
     echo -e "${YELLOW}Intentando boot directo con Multiboot...${NC}"
+    echo -e "${GREEN}🌐 Red habilitada: F3-OS puede acceder al servidor GUI en http://10.0.2.2:8080${NC}"
     # Usar -machine con opciones modernas (sin deprecaciones)
     qemu-system-x86_64 \
       -kernel kernel.bin \
@@ -107,6 +114,7 @@ else
       -serial stdio \
       -name "F3-OS" \
       -nodefaults \
+      $NETWORK_ARGS \
       "$@"
 fi
 

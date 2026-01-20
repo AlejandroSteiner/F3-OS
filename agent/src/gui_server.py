@@ -306,7 +306,8 @@ class GUIServer:
                         raise OSError(f"No se pudo encontrar un puerto disponible después de {max_attempts} intentos")
                 
                 # Puerto disponible, crear servidor
-                self.server = HTTPServer(('localhost', self.port), handler_factory)
+                # Escuchar en 0.0.0.0 para que sea accesible desde QEMU/F3-OS
+                self.server = HTTPServer(('0.0.0.0', self.port), handler_factory)
                 if original_port != self.port:
                     print(f"ℹ️  Usando puerto {self.port} (el puerto {original_port} estaba ocupado)")
                 break
@@ -321,8 +322,10 @@ class GUIServer:
         self.running = True
         
         def run_server():
-            print(f"🌐 Servidor GUI del asistente iniciado en http://localhost:{self.port}")
-            print(f"📱 Abre en tu navegador: http://localhost:{self.port}")
+            print(f"🌐 Servidor GUI del asistente iniciado en http://0.0.0.0:{self.port}")
+            print(f"📱 Accesible desde:")
+            print(f"   - Host: http://localhost:{self.port}")
+            print(f"   - F3-OS (QEMU): http://10.0.2.2:{self.port}")
             print(f"💬 Interfaz web disponible para chatear con el asistente")
             print("")
             self.server.serve_forever()
