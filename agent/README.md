@@ -26,28 +26,51 @@ pip install -r requirements.txt
 
 ## Uso
 
-### Evaluar un PR
+### Método Recomendado: Script de Ejecución
 
 ```bash
-python -m src.main evaluate-pr <PR_NUMBER>
+cd agent
+./run.sh [comando]
 ```
 
-### Monitorear PRs automáticamente
+El script `run.sh`:
+- ✅ Verifica que Python esté instalado
+- ✅ Crea archivo de configuración si no existe
+- ✅ Instala dependencias automáticamente si faltan
+- ✅ Ejecuta el agente correctamente
 
+### Comandos Disponibles
+
+**Evaluar un PR específico:**
 ```bash
-python -m src.main monitor
+./run.sh evaluate-pr --pr 123
 ```
 
-### Operar en ciclo de fases
-
+**Monitorear PRs automáticamente:**
 ```bash
-python -m src.main cycle
+./run.sh monitor
 ```
 
-### Iniciar servidor GUI del asistente
+**Ver estado del agente:**
+```bash
+./run.sh status
+```
+
+**Ejecutar ciclo completo:**
+```bash
+./run.sh cycle
+```
+
+**Iniciar servidor GUI del asistente:**
+```bash
+./run.sh gui-server --port 8080
+```
+
+### Método Alternativo: Ejecución Directa
 
 ```bash
-python -m src.main gui-server --port 8080
+cd agent
+python3 run_agent.py [comando]
 ```
 
 Esto inicia un servidor HTTP que la GUI de F3-OS puede usar para comunicarse con el asistente.
