@@ -2,11 +2,20 @@
 
 ## 🚀 Ejecución Rápida
 
-### Paso 1: Instalar dependencias
+### Opción 1: Usar Entorno Virtual (Recomendado)
 
 ```bash
 cd agent
-pip3 install -r requirements.txt
+./setup_venv.sh
+./run_venv.sh status
+```
+
+### Opción 2: Instalación Manual
+
+```bash
+cd agent
+pip3 install --user -r requirements.txt
+./run.sh status
 ```
 
 ### Paso 2: Configurar
