@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Leer el Manifiesto
+    url: https://github.com/AlejandroSteiner/f3-os/blob/main/MANIFIESTO.md
+    about: Entiende qué es y qué NO es F3-OS antes de abrir un Issue
+  - name: Guía de Contribución
+    url: https://github.com/AlejandroSteiner/f3-os/blob/main/CONTRIBUTING.md
+    about: Reglas y proceso de contribución
+
