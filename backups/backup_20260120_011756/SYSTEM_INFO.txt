@@ -1,0 +1,6 @@
+Fecha: mar 20 ene 2026 01:17:56 -03
+Usuario: ktzchen
+Sistema: Linux ktzchen-MS-7E28 6.14.0-37-generic #37~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Nov 20 10:25:38 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+Rust: rustc 1.94.0-nightly (fe98ddcfc 2026-01-17)
+Git: git version 2.43.0
+Directorio: /home/ktzchen/Documentos/f3-os

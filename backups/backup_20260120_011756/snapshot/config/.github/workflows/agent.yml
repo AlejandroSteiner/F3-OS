@@ -1,0 +1,55 @@
+name: F3-OS Governance Agent
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to evaluate'
+        required: false
+        type: string
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          cd agent
+          pip install -r requirements.txt
+      
+      - name: Configure agent
+        run: |
+          cd agent
+          cp config/config.example.yaml config/config.yaml
+          # El token se configura como secret
+          echo "github:" >> config/config.yaml
+          echo "  token: \${{ secrets.GITHUB_TOKEN }}" >> config/config.yaml
+          echo "  owner: ${{ github.repository_owner }}" >> config/config.yaml
+          echo "  repo: ${{ github.event.repository.name }}" >> config/config.yaml
+      
+      - name: Evaluate PR
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+        run: |
+          cd agent
+          if [ -n "$PR_NUMBER" ]; then
+            python -m src.main evaluate-pr --pr $PR_NUMBER
+          else
+            python -m src.main monitor
+          fi
+

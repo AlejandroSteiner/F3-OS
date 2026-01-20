@@ -1,0 +1,314 @@
+commit fd3e7ab7d3fd0b09a4cec009a3df1a903ee67f3a
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Tue Jan 20 01:15:42 2026 -0300
+
+    feat: agregar asistente GUI como amigo del usuario
+    
+    Implementar asistente GUI que funciona como amigo/asistente del usuario
+    dentro de la interfaz gráfica de F3-OS.
+    
+    Características:
+    - Interfaz de chat conversacional
+    - Conoce el estado del sistema F3 (fase, entropía, etc.)
+    - Personalidad configurable (friendly, technical, adaptive)
+    - Sugerencias de preguntas/comandos
+    - Historial de conversación
+    - Integración con agente gobernante
+    
+    Integración:
+    - API HTTP simple en localhost:8080
+    - Callbacks para actualizaciones en tiempo real
+    - Estado compartido con sistema F3
+    - Respeta límites de recursos (15-20% CPU)
+    
+    El asistente puede:
+    - Explicar el modelo F3
+    - Mostrar estado del sistema
+    - Ayudar con navegación
+    - Responder preguntas sobre desarrollo
+    - Conversar de forma amigable
+    
+    Ver agent/GUI_ASSISTANT.md para documentación completa.
+
+ agent/GUI_ASSISTANT.md           | 159 ++++++++++++++++++++
+ agent/README.md                  |   8 +
+ agent/config/config.example.yaml |  11 ++
+ agent/src/gui_assistant.py       | 310 +++++++++++++++++++++++++++++++++++++++
+ agent/src/gui_integration.py     | 146 ++++++++++++++++++
+ agent/src/gui_server.py          | 154 +++++++++++++++++++
+ agent/src/main.py                |  42 +++++-
+ 7 files changed, 829 insertions(+), 1 deletion(-)
+
+commit cf901ed9ac47308dd4d2383e1018d7be57447e54
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Tue Jan 20 01:12:05 2026 -0300
+
+    feat: agregar gestión de recursos con límite 15-20% CPU
+    
+    Implementar ResourceManager que limita el uso de CPU del agente a 15-20%.
+    
+    Características:
+    - Monitoreo continuo de uso de CPU en thread separado
+    - Throttling automático entre operaciones
+    - Rate limiting con ThrottledOperation context manager
+    - Configuración de límites en config.yaml
+    - Estadísticas de recursos en status
+    - Alertas si excede límites
+    
+    El agente ahora:
+    - Consume máximo 20% CPU (configurable)
+    - Objetivo de 15% CPU
+    - Pausa automática entre operaciones
+    - No sobrecarga el sistema
+    - Ideal para ejecución continua en background
+    
+    Ver agent/RECURSOS.md para documentación completa.
+
+ .github/workflows/agent.yml      |  55 ++++++++++
+ README.md                        |   3 +
+ agent/.gitignore                 |  32 ++++++
+ agent/INSTALL.md                 |  99 +++++++++++++++++
+ agent/README.md                  |  50 +++++++++
+ agent/RECURSOS.md                | 112 +++++++++++++++++++
+ agent/config/config.example.yaml | 106 ++++++++++++++++++
+ agent/data/.gitkeep              |   0
+ agent/logs/.gitkeep              |   0
+ agent/requirements.txt           |  21 ++++
+ agent/src/__init__.py            |   8 ++
+ agent/src/code_analyzer.py       | 176 ++++++++++++++++++++++++++++++
+ agent/src/context_manager.py     | 165 ++++++++++++++++++++++++++++
+ agent/src/development_phase.py   | 161 +++++++++++++++++++++++++++
+ agent/src/github_integration.py  | 130 ++++++++++++++++++++++
+ agent/src/governance_core.py     | 183 +++++++++++++++++++++++++++++++
+ agent/src/main.py                | 191 ++++++++++++++++++++++++++++++++
+ agent/src/resource_manager.py    | 154 ++++++++++++++++++++++++++
+ agent/src/synthesis_engine.py    | 227 +++++++++++++++++++++++++++++++++++++++
+ 19 files changed, 1873 insertions(+)
+
+commit 86d67f44b1af0d6739950bd545e008824625b636
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Tue Jan 20 01:05:34 2026 -0300
+
+    feat: agregar visión del agente AI gobernante para desarrollo
+    
+    Documento que define cómo un agente AI especializado podría gobernar
+    el desarrollo de F3-OS, manteniendo coherencia con el modelo F3.
+    
+    Características clave:
+    - Arquitectura paralela al F3 Core (Code Analyzer, Context Manager,
+      Synthesis Engine, Governance Core)
+    - Ciclo de desarrollo adaptativo (Lógico → Ilógico → Síntesis → Perfecto)
+    - Interacción humano-agente con límites claros
+    - Roadmap de implementación en 4 fases
+    - Transparencia total y override humano siempre disponible
+    
+    Extensión natural del concepto: si F3-OS piensa como una AI, su desarrollo
+    también debería estar gobernado por un agente que entiende el modelo F3.
+
+ AGENTE_GOBERNANTE.md | 461 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ README.md            |   1 +
+ 2 files changed, 462 insertions(+)
+
+commit bb9289d4f3e070289ab53d5c22ce598c81f924b4
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Mon Jan 19 23:31:05 2026 -0300
+
+    docs: mejorar análisis de seguridad con enfoque técnico preciso
+    
+    Reescribir documento incorporando conceptos técnicos clave:
+    - Invariantes intocables vs zonas adaptativas
+    - Reward hacking y cómo prevenirlo
+    - Regla de oro: núcleo más rígido que Linux
+    - Qué aporta realmente el cambio cognitivo (scheduler, memoria, feedback)
+    - Lo que NO protege (bugs estructurales)
+    - Seguridad y productividad como complementos, no conflictos
+    - Frase clave: reducir predictibilidad, no prometer invulnerabilidad
+    
+    Análisis más honesto y técnicamente defendible.
+
+ SEGURIDAD_Y_RESISTENCIA.md | 532 ++++++++++++++++++++++++++-------------------
+ 1 file changed, 311 insertions(+), 221 deletions(-)
+
+commit 7427fb12f2e6c233b23c323406b8f340327e4730
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Mon Jan 19 23:23:21 2026 -0300
+
+    docs: agregar análisis técnico de seguridad y resistencia a vulnerabilidades
+    
+    Análisis honesto sobre cómo el modelo adaptativo de F3-OS afecta la seguridad:
+    - Ventajas: defensa en movimiento, detección de anomalías nativa
+    - Riesgos: complejidad, fase ilógica explotable, oscilación
+    - Recomendaciones: núcleo determinista, límites duros, validación de feedback
+    
+    Responde la pregunta: ¿puede el cambio cognitivo constante hacer al sistema
+    más resistente a vulnerabilidades? Respuesta: sí, pero con diseño cuidadoso.
+
+ README.md                  |   1 +
+ SEGURIDAD_Y_RESISTENCIA.md | 335 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 336 insertions(+)
+
+commit 28c9312188804e927b68f5b1cfebf073aedf90cc
+Merge: bc1aebe 3c2dbff
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Mon Jan 19 22:52:29 2026 -0300
+
+    merge: resolver conflicto en README.md manteniendo versión con governance
+
+commit bc1aebe47f297f860183a3ada4b193c6569ab2ab
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Mon Jan 19 22:51:15 2026 -0300
+
+    feat: agregar estructura completa de governance y templates para GitHub
+    
+    - Agregar MANIFIESTO.md: define qué es y qué NO es F3-OS
+    - Agregar CONTRIBUTING.md: reglas estrictas de contribución
+    - Agregar GOVERNANCE.md: estructura de gobierno y núcleo sagrado
+    - Agregar CODE_OF_CONDUCT.md: código de conducta de la comunidad
+    - Agregar templates de GitHub (Issues y PRs)
+    - Actualizar README.md: más honesto sobre qué es y qué NO es
+    - Agregar PREPARACION_GITHUB.md: guía de lo implementado
+    
+    Esta estructura protege el núcleo conceptual (F3 Core, 3 hilos, ciclo de fases)
+    mientras permite evolución en áreas abiertas. Sigue el principio: 'No es un
+    experimento social. Es un experimento de sistema operativo cognitivo.'
+
+ .github/ISSUE_TEMPLATE/bug_report.md |  63 ++++++++
+ .github/ISSUE_TEMPLATE/conceptual.md |  81 ++++++++++
+ .github/ISSUE_TEMPLATE/config.yml    |   9 ++
+ .github/ISSUE_TEMPLATE/question.md   |  34 +++++
+ .github/PULL_REQUEST_TEMPLATE.md     |  84 +++++++++++
+ CODE_OF_CONDUCT.md                   | 101 +++++++++++++
+ CONTRIBUTING.md                      | 284 +++++++++++++++++++++++++++++++++++
+ GOVERNANCE.md                        | 213 ++++++++++++++++++++++++++
+ MANIFIESTO.md                        | 172 +++++++++++++++++++++
+ PREPARACION_GITHUB.md                | 250 ++++++++++++++++++++++++++++++
+ README.md                            |  60 +++++++-
+ 11 files changed, 1343 insertions(+), 8 deletions(-)
+
+commit 3c2dbff9e41e573d945e0b244ba7cc91692b34c4
+Author: Alejandro Steiner <117600957+AlejandroSteiner@users.noreply.github.com>
+Date:   Mon Jan 19 22:35:39 2026 -0300
+
+    Fix typo in purpose description of the OS
+    
+    Corrected a typo in the README regarding the purpose of the operating system.
+
+ README.md | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit dbd3e0ee78a366424de035d90836c9509c6b9f69
+Author: Alejandro Steiner <117600957+AlejandroSteiner@users.noreply.github.com>
+Date:   Mon Jan 19 22:34:27 2026 -0300
+
+    Expand README with F3-OS overview and insights
+    
+    Added detailed explanation and technical insights about F3-OS as an experimental operating system and its potential applications in AI and resource management.
+
+ README.md | 323 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 323 insertions(+)
+
+commit 07dad7e032f00fd2bc49c3d0d1af7ddc738036b2
+Author: Alejandro Steiner <117600957+AlejandroSteiner@users.noreply.github.com>
+Date:   Mon Jan 19 09:48:55 2026 -0300
+
+    Update copyright year in LICENSE file
+
+ LICENSE | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 8e958b27eecbd74d40634dcb5418121aaf482815
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Sun Jan 18 06:31:55 2026 -0300
+
+    Añadir script para actualizar descripción usando API de GitHub
+    
+    - Script que usa curl y API de GitHub
+    - Soporte para token desde variable de entorno o git credentials
+    - Interfaz interactiva para ingresar token
+    - Manejo de errores y mensajes informativos
+
+ actualizar_descripcion_api.sh | 96 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 96 insertions(+)
+
+commit 1334d8cd7ace04709b12dd5e72fc7d7515211d34
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Sun Jan 18 06:30:21 2026 -0300
+
+    Añadir descripción del repositorio y scripts de configuración
+    
+    - Descripción completa para GitHub
+    - Script para configurar repositorio automáticamente
+    - Instrucciones para configuración manual
+    - Topics y etiquetas sugeridas
+    - Compatible con GitHub CLI y API
+
+ DESCRIPCION_REPO.md          |  77 +++++++++++++++++++++++++++
+ INSTRUCCIONES_DESCRIPCION.md | 120 +++++++++++++++++++++++++++++++++++++++++++
+ configurar_repo_github.sh    | 108 ++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 305 insertions(+)
+
+commit d1ff9328bc75aecb6a17c50d48bd8138ecd09011
+Author: AlejandroSteiner <github@alejandrosteiner.dev>
+Date:   Sun Jan 18 06:28:30 2026 -0300
+
+    Initial commit: F3-OS v0.1.0
+    
+    - Kernel básico en Rust (#![no_std])
+    - Sistema F3 Core con 3 hilos (CPU, RAM, MEM)
+    - Ciclo de fases: Lógico → Ilógico → Síntesis → Perfecto
+    - Driver VGA para salida de texto
+    - Multiboot header para bootloaders
+    - Scripts de build y ejecución
+    - Documentación completa
+    - Código abierto bajo GPL-3.0
+
+ .cargo/config.toml            |  10 +
+ .gitignore                    |  38 ++++
+ ACLARACION_LIMINE.md          |  78 ++++++++
+ ARQUITECTURA_COMPLETA.md      | 447 ++++++++++++++++++++++++++++++++++++++++++
+ ARREGLAR_GRUB.sh              |  87 ++++++++
+ BOOT_ALTERNATIVO.md           |  58 ++++++
+ BOOT_DIRECTO.md               |  55 ++++++
+ Cargo.toml                    |  19 ++
+ DEBUG_GRUB.md                 |  76 +++++++
+ ESTADO_ACTUAL.md              | 225 +++++++++++++++++++++
+ GUIA_PRUEBAS_SEGURAS.md       | 426 ++++++++++++++++++++++++++++++++++++++++
+ INNOVACION_Y_VALOR.md         | 361 ++++++++++++++++++++++++++++++++++
+ INSTALACION_UBUNTU.sh         |  65 ++++++
+ INSTALAR_DEPENDENCIAS.sh      |  27 +++
+ LICENSE                       |  17 ++
+ PROBLEMA_BOOT_QEMU.md         |  48 +++++
+ README.md                     | 239 ++++++++++++++++++++++
+ REGLAS_LOGICA.md              | 240 +++++++++++++++++++++++
+ SEGURIDAD_QEMU.md             | 232 ++++++++++++++++++++++
+ SOLUCION_ERRORES.md           |  58 ++++++
+ SOLUCION_FINAL.md             |  96 +++++++++
+ SOLUCION_SIMPLE.md            |  53 +++++
+ TEST_GRUB.sh                  |  34 ++++
+ VERIFICACION_BOOT_QEMU.md     | 131 +++++++++++++
+ boot/limine.cfg               |   8 +
+ build.sh                      | 101 ++++++++++
+ create_grub_iso.sh            | 130 ++++++++++++
+ create_iso.sh                 | 276 ++++++++++++++++++++++++++
+ kernel/Cargo.toml             |   7 +
+ kernel/linker.ld              |  46 +++++
+ kernel/src/arch/mod.rs        |   7 +
+ kernel/src/arch/x86_64.rs     |   5 +
+ kernel/src/arch/x86_64.rs:1:8 |   0
+ kernel/src/boot.rs            |  26 +++
+ kernel/src/f3/core.rs         | 246 +++++++++++++++++++++++
+ kernel/src/f3/core.rs:231:8   |   0
+ kernel/src/f3/cpu.rs          |  43 ++++
+ kernel/src/f3/cpu.rs:37:8     |   0
+ kernel/src/f3/mem.rs          |  62 ++++++
+ kernel/src/f3/mem.rs:56:8     |   0
+ kernel/src/f3/mod.rs          |  26 +++
+ kernel/src/f3/ram.rs          |  43 ++++
+ kernel/src/f3/ram.rs:37:8     |   0
+ kernel/src/lib.rs             |   6 +
+ kernel/src/main.rs            |  59 ++++++
+ kernel/src/vga.rs             |  69 +++++++
+ run.sh                        |  58 ++++++
+ run_iso.sh                    |  28 +++
+ x86_64-unknown-none.json      |  16 ++
+ 49 files changed, 4382 insertions(+)

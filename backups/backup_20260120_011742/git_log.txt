@@ -1,0 +1,13 @@
+fd3e7ab feat: agregar asistente GUI como amigo del usuario
+cf901ed feat: agregar gestión de recursos con límite 15-20% CPU
+86d67f4 feat: agregar visión del agente AI gobernante para desarrollo
+bb9289d docs: mejorar análisis de seguridad con enfoque técnico preciso
+7427fb1 docs: agregar análisis técnico de seguridad y resistencia a vulnerabilidades
+28c9312 merge: resolver conflicto en README.md manteniendo versión con governance
+bc1aebe feat: agregar estructura completa de governance y templates para GitHub
+3c2dbff Fix typo in purpose description of the OS
+dbd3e0e Expand README with F3-OS overview and insights
+07dad7e Update copyright year in LICENSE file
+8e958b2 Añadir script para actualizar descripción usando API de GitHub
+1334d8c Añadir descripción del repositorio y scripts de configuración
+d1ff932 Initial commit: F3-OS v0.1.0
