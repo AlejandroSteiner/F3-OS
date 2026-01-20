@@ -12,6 +12,7 @@ from enum import Enum
 import logging
 
 from .project_analyzer import ProjectAnalyzer
+from .project_knowledge_base import ProjectKnowledgeBase
 
 logger = logging.getLogger(__name__)
 
@@ -63,12 +64,17 @@ class GUIAssistant:
             context_aware=True
         )
         
-        # Analizador de proyecto
+        # Base de conocimiento completa (regla primaria)
         project_root = config.get('project_root', None)
+        self.knowledge_base = ProjectKnowledgeBase(project_root=project_root)
+        
+        # Analizador de proyecto (para búsquedas específicas)
         self.project_analyzer = ProjectAnalyzer(project_root=project_root)
         
         # Respuestas predefinidas
         self._init_responses()
+        
+        logger.info("GUIAssistant inicializado con base de conocimiento completa")
     
     def _init_responses(self):
         """Inicializa respuestas y patrones de conversación"""
@@ -189,32 +195,33 @@ class GUIAssistant:
             return f"¡Hola {self.state.user_name}! ¿En qué puedo ayudarte hoy?"
         
         elif intent == 'rules':
-            # Obtener todas las reglas del proyecto
-            logger.info("Usuario pregunta sobre reglas - analizando proyecto...")
-            rules = self.project_analyzer.get_rules()
-            if rules and len(rules) > 100:
-                # Resumir si es muy largo
+            # Obtener TODAS las reglas desde la base de conocimiento completa
+            logger.info("Usuario pregunta sobre reglas - usando base de conocimiento completa...")
+            rules = self.knowledge_base.get_complete_rules()
+            if rules:
                 rules_lines = rules.split('\n')
-                if len(rules_lines) > 100:
-                    response = "📋 **Reglas del Proyecto F3-OS:**\n\n"
-                    response += '\n'.join(rules_lines[:100])
-                    response += "\n\n... (hay más reglas. ¿Quieres que profundice en alguna específica?)"
+                if len(rules_lines) > 150:
+                    response = "📋 **Todas las Reglas del Proyecto F3-OS (Base de Conocimiento Completa):**\n\n"
+                    response += '\n'.join(rules_lines[:150])
+                    response += f"\n\n... (Total: {len(rules_lines)} reglas. ¿Quieres que profundice en alguna específica?)"
                 else:
-                    response = "📋 **Reglas del Proyecto F3-OS:**\n\n" + rules
+                    response = "📋 **Todas las Reglas del Proyecto F3-OS:**\n\n" + rules
             else:
+                # Fallback al analizador
+                rules = self.project_analyzer.get_rules()
                 response = "📋 **Reglas del Proyecto F3-OS:**\n\n" + (rules if rules else "No se encontraron reglas documentadas.")
             return response
         
         elif intent == 'explain_from_scratch':
-            # Explicación completa desde cero
-            logger.info("Usuario pide explicación desde cero - analizando proyecto...")
-            explanation = self.project_analyzer.explain_from_scratch()
-            if explanation:
-                response = "📚 **Explicación Completa de F3-OS desde Cero:**\n\n"
-                response += explanation
-                response += "\n\n¿Hay algo específico que quieras que profundice?"
-            else:
-                response = "Estoy analizando los archivos del proyecto para darte una explicación completa. Por favor, intenta de nuevo en un momento."
+            # Explicación completa desde cero usando base de conocimiento
+            logger.info("Usuario pide explicación desde cero - usando base de conocimiento completa...")
+            overview = self.knowledge_base.get_project_overview()
+            human_functions = self.knowledge_base.get_human_functions()
+            
+            response = "📚 **Explicación Completa de F3-OS desde Cero (Base de Conocimiento Completa):**\n\n"
+            response += overview
+            response += "\n\n" + human_functions
+            response += "\n\n¿Hay algo específico que quieras que profundice?"
             return response
         
         elif intent == 'f3_model':
@@ -282,15 +289,24 @@ class GUIAssistant:
             return response
         
         else:  # general
-            # Intentar búsqueda en archivos
-            search_results = self.project_analyzer.search_in_files(user_input)
-            if search_results:
-                response = f"🔍 **Encontré información relacionada con tu pregunta:**\n\n"
-                for filename, content in search_results[:3]:  # Máximo 3 resultados
-                    response += f"**En {filename}:**\n{content[:500]}...\n\n"
-                response += "¿Quieres que profundice en algún aspecto específico?"
+            # Resolución inmediata usando base de conocimiento completa
+            logger.info(f"Resolviendo consulta inmediata: {user_input[:50]}...")
+            immediate_response = self.knowledge_base.resolve_query_immediate(user_input)
+            
+            if immediate_response and "no encontrada" not in immediate_response.lower():
+                response = f"🔍 **Respuesta Inmediata (Base de Conocimiento Completa):**\n\n"
+                response += immediate_response
+                response += "\n\n¿Necesitas más información sobre algún aspecto específico?"
             else:
-                return self._generate_general_response(user_input)
+                # Fallback: búsqueda en archivos
+                search_results = self.project_analyzer.search_in_files(user_input)
+                if search_results:
+                    response = f"🔍 **Encontré información relacionada con tu pregunta:**\n\n"
+                    for filename, content in search_results[:3]:
+                        response += f"**En {filename}:**\n{content[:500]}...\n\n"
+                    response += "¿Quieres que profundice en algún aspecto específico?"
+                else:
+                    return self._generate_general_response(user_input)
             return response
     
     def _generate_general_response(self, user_input: str) -> str:

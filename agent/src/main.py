@@ -163,6 +163,7 @@ def run_cycle(config: Dict, data_dir: Path):
 def start_gui_server(config: Dict, data_dir: Path, port: int = 8080):
     """Inicia servidor HTTP para GUI del asistente"""
     print(f"🎨 Iniciando servidor GUI del asistente en puerto {port}...")
+    print("📚 Cargando base de conocimiento completa del proyecto (regla primaria)...")
     
     from .gui_server import GUIServer
     
@@ -178,6 +179,8 @@ def start_gui_server(config: Dict, data_dir: Path, port: int = 8080):
     
     from .gui_integration import GUIIntegration
     gui = GUIIntegration(governance, resource_manager, config)
+    
+    print("✅ Base de conocimiento completa cargada - Resolución inmediata habilitada")
     
     server = GUIServer(gui, port=port)
     server.start()
