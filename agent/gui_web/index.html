@@ -37,12 +37,136 @@
             text-align: center;
             padding-bottom: 20px;
             border-bottom: 2px solid #667eea;
+            position: relative;
         }
         
         .header h1 {
             color: #667eea;
             font-size: 2em;
             margin-bottom: 10px;
+        }
+        
+        /* Indicador de Vida del Agente - Estilo F1/Star Wars */
+        .agent-life-indicator {
+            position: absolute;
+            top: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+        
+        .life-gauge {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .life-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 8px solid #1a1a2e;
+            background: conic-gradient(
+                from 0deg,
+                #00ff41 0deg,
+                #00ff41 calc(var(--life-percent) * 3.6deg),
+                #1a1a2e calc(var(--life-percent) * 3.6deg),
+                #1a1a2e 360deg
+            );
+            position: relative;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 65, 0.5),
+                inset 0 0 20px rgba(0, 0, 0, 0.8);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 
+                    0 0 20px rgba(0, 255, 65, 0.5),
+                    inset 0 0 20px rgba(0, 0, 0, 0.8);
+            }
+            50% {
+                box-shadow: 
+                    0 0 30px rgba(0, 255, 65, 0.8),
+                    inset 0 0 20px rgba(0, 0, 0, 0.8);
+            }
+        }
+        
+        .life-inner {
+            width: 70%;
+            height: 70%;
+            border-radius: 50%;
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #00ff41;
+            box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.3);
+        }
+        
+        .life-status {
+            font-size: 0.7em;
+            color: #00ff41;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
+        }
+        
+        .life-time {
+            font-size: 0.5em;
+            color: #00ff88;
+            margin-top: 2px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .life-bars {
+            display: flex;
+            gap: 3px;
+            margin-top: 5px;
+        }
+        
+        .life-bar {
+            width: 4px;
+            height: 20px;
+            background: #00ff41;
+            box-shadow: 0 0 5px rgba(0, 255, 65, 0.8);
+            animation: barPulse 1.5s ease-in-out infinite;
+        }
+        
+        .life-bar:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .life-bar:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes barPulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scaleY(0.7);
+            }
+        }
+        
+        .life-label {
+            font-size: 0.6em;
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 3px;
+            font-family: 'Courier New', monospace;
         }
         
         .header p {
@@ -180,6 +304,22 @@
 <body>
     <div class="container">
         <div class="header">
+            <div class="agent-life-indicator">
+                <div class="life-gauge">
+                    <div class="life-circle" id="lifeCircle" style="--life-percent: 100">
+                        <div class="life-inner">
+                            <div class="life-status" id="lifeStatus">ONLINE</div>
+                            <div class="life-time" id="lifeTime">00:00:00</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="life-bars">
+                    <div class="life-bar"></div>
+                    <div class="life-bar"></div>
+                    <div class="life-bar"></div>
+                </div>
+                <div class="life-label">AGENT LIFE</div>
+            </div>
             <h1>🤖 F3-OS Assistant</h1>
             <p>Tu amigo y asistente en F3-OS</p>
         </div>
@@ -225,9 +365,13 @@
     <script>
         const API_URL = 'http://localhost:8080';
         
+        // Tiempo de inicio del agente
+        let agentStartTime = Date.now();
+        
         // Cargar estado inicial
         loadStatus();
         setInterval(loadStatus, 5000); // Actualizar cada 5 segundos
+        setInterval(updateLifeIndicator, 1000); // Actualizar indicador cada segundo
         
         // Permitir Enter para enviar
         document.getElementById('userInput').addEventListener('keypress', function(e) {
@@ -295,6 +439,42 @@
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
+        
+        function updateLifeIndicator() {
+            // Calcular tiempo activo
+            const elapsed = Date.now() - agentStartTime;
+            const hours = Math.floor(elapsed / 3600000);
+            const minutes = Math.floor((elapsed % 3600000) / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            
+            // Formatear tiempo
+            const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('lifeTime').textContent = timeStr;
+            
+            // Calcular porcentaje de vida (simulado - siempre 100% si está activo)
+            // En el futuro se puede conectar con métricas reales del agente
+            const lifePercent = 100; // Siempre activo si la página está cargada
+            
+            // Actualizar círculo de vida
+            const circle = document.getElementById('lifeCircle');
+            circle.style.setProperty('--life-percent', lifePercent);
+            
+            // Actualizar estado
+            const status = document.getElementById('lifeStatus');
+            if (lifePercent > 75) {
+                status.textContent = 'ONLINE';
+                status.style.color = '#00ff41';
+            } else if (lifePercent > 50) {
+                status.textContent = 'WARNING';
+                status.style.color = '#ffaa00';
+            } else {
+                status.textContent = 'CRITICAL';
+                status.style.color = '#ff0000';
+            }
+        }
+        
+        // Inicializar indicador
+        updateLifeIndicator();
     </script>
 </body>
 </html>
