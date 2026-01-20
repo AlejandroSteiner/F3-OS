@@ -25,8 +25,12 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
         parsed_path = urlparse(self.path)
         path = parsed_path.path
         
-        if path == '/assistant/status':
+        if path == '/' or path == '/index.html':
+            self._handle_index()
+        elif path == '/assistant/status':
             self._handle_status()
+        elif path == '/api/status':
+            self._handle_api_status()
         elif path == '/assistant/conversation':
             self._handle_conversation()
         elif path == '/assistant/suggestions':
@@ -43,10 +47,64 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
             self._handle_open()
         elif path == '/assistant/close':
             self._handle_close()
-        elif path == '/assistant/message':
+        elif path == '/assistant/message' or path == '/api/query':
             self._handle_message()
         else:
             self._send_error(404, "Not Found")
+    
+    def _handle_index(self):
+        """Sirve la página HTML principal"""
+        import os
+        from pathlib import Path
+        
+        # Buscar index.html en gui_web/
+        script_dir = Path(__file__).parent.parent
+        html_path = script_dir / 'gui_web' / 'index.html'
+        
+        if html_path.exists():
+            with open(html_path, 'r', encoding='utf-8') as f:
+                html_content = f.read()
+            
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            self.wfile.write(html_content.encode('utf-8'))
+        else:
+            # HTML básico si no existe el archivo
+            html = """
+<!DOCTYPE html>
+<html>
+<head><title>F3-OS Assistant</title></head>
+<body>
+<h1>F3-OS Assistant</h1>
+<p>Servidor funcionando. Abre la consola del navegador para usar la API.</p>
+<p>Endpoints disponibles:</p>
+<ul>
+<li>GET /api/status - Estado del agente</li>
+<li>POST /api/query - Enviar consulta</li>
+</ul>
+</body>
+</html>
+"""
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.end_headers()
+            self.wfile.write(html.encode('utf-8'))
+    
+    def _handle_api_status(self):
+        """Obtiene estado del agente para la API"""
+        status = self.gui.governance_core.get_status()
+        resources = self.gui.resource_manager.get_stats()
+        
+        self._send_json(200, {
+            'phase': status.get('phase', 'unknown'),
+            'entropy': status.get('entropy', 0),
+            'perfection_score': status.get('perfection_score', 0),
+            'cycle_count': status.get('cycle_count', 0),
+            'cpu_percent': resources.get('cpu_percent', 0.0),
+            'memory_mb': resources.get('memory_mb', 0.0),
+        })
     
     def _handle_status(self):
         """Obtiene estado del asistente"""
@@ -75,15 +133,20 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
     
     def _handle_message(self):
         """Envía mensaje al asistente"""
-        content_length = int(self.headers['Content-Length'])
+        content_length = int(self.headers.get('Content-Length', 0))
+        if content_length == 0:
+            self._send_error(400, "Content-Length required")
+            return
+            
         post_data = self.rfile.read(content_length)
         
         try:
             data = json.loads(post_data.decode('utf-8'))
-            message = data.get('message', '')
+            # Soporta tanto 'message' como 'query'
+            message = data.get('message') or data.get('query', '')
             
             if not message:
-                self._send_error(400, "Message required")
+                self._send_error(400, "Message or query required")
                 return
             
             response = self.gui.send_message(message)
@@ -134,8 +197,15 @@ class GUIServer:
         
         def run_server():
             print(f"🌐 Servidor GUI del asistente iniciado en http://localhost:{self.port}")
+            print(f"📱 Abre en tu navegador: http://localhost:{self.port}")
+            print(f"💬 Interfaz web disponible para chatear con el asistente")
+            print("")
             while self.running:
-                self.server.handle_request()
+                try:
+                    self.server.handle_request()
+                except Exception as e:
+                    if self.running:  # Solo loguear si aún está corriendo
+                        print(f"Error en servidor: {e}")
         
         self.server_thread = threading.Thread(target=run_server, daemon=True)
         self.server_thread.start()
