@@ -14,15 +14,35 @@ class GitHubIntegration:
         self.config = config
         github_config = config.get('github', {})
         self.token = github_config.get('token')
-        self.owner = github_config.get('owner')
-        self.repo_name = github_config.get('repo')
+        self.owner = github_config.get('owner', 'AlejandroSteiner')
+        self.repo_name = github_config.get('repo', 'F3-OS')
         self.main_branch = github_config.get('main_branch', 'main')
         
-        if not self.token:
-            raise ValueError("GitHub token no configurado")
+        if not self.token or self.token == 'ghp_YOUR_TOKEN_HERE' or self.token == 'your_github_token_here':
+            print("\n❌ Error: Token de GitHub no configurado")
+            print("")
+            print("Para configurar el token:")
+            print("1. Ejecuta: ./setup_config.sh")
+            print("2. O edita manualmente: config/config.yaml")
+            print("")
+            print("Para obtener un token:")
+            print("  https://github.com/settings/tokens")
+            print("  Permisos necesarios: repo, pull_requests, issues")
+            print("")
+            raise ValueError("GitHub token no configurado. Ejecuta ./setup_config.sh")
         
-        self.github = Github(self.token)
-        self.repo = self.github.get_repo(f"{self.owner}/{self.repo_name}")
+        try:
+            self.github = Github(self.token)
+            self.repo = self.github.get_repo(f"{self.owner}/{self.repo_name}")
+        except Exception as e:
+            if "Bad credentials" in str(e) or "401" in str(e):
+                print("\n❌ Error: Token de GitHub inválido o expirado")
+                print("")
+                print("Para configurar un nuevo token:")
+                print("  ./setup_config.sh")
+                print("")
+                print("O edita: config/config.yaml")
+            raise
     
     def get_pr(self, pr_number: int, resource_manager=None) -> Dict:
         """Obtiene datos de un PR"""
