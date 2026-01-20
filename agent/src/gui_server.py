@@ -186,7 +186,7 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
     def _handle_api_status(self):
         """Obtiene estado del agente para la API"""
         status = self.gui.governance_core.get_status()
-        resources = self.gui.resource_manager.get_stats()
+        resources = self.gui.resource_manager.get_resource_stats()
         
         self._send_json(200, {
             'phase': status.get('phase', 'unknown'),
