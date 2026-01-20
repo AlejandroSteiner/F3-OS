@@ -8,6 +8,34 @@
 
 > **⚠️ IMPORTANTE**: Lee el [MANIFIESTO.md](MANIFIESTO.md) antes de contribuir. F3-OS no es un sistema operativo tradicional. Es un experimento cognitivo a nivel kernel con reglas y filosofía específicas.
 
+## 🤖 Agente Gobernante AI - Interfaz GUI
+
+F3-OS incluye un **agente AI especializado** que gobierna el desarrollo del proyecto y actúa como asistente interactivo para los usuarios. La interfaz presenta un diseño futurista estilo Star Wars/Fórmula 1.
+
+<div align="center">
+
+![F3-OS Assistant Interface](https://raw.githubusercontent.com/AlejandroSteiner/F3-OS/main/agent/gui_web/screenshot.png)
+
+*Interfaz del asistente con indicador de vida del agente (arriba derecha), panel de estado en tiempo real, y chat interactivo*
+
+</div>
+
+**Características principales:**
+- 🟢 **Indicador de Vida del Agente**: Reloj circular estilo F1/Star Wars con tiempo activo en tiempo real
+- 📊 **Panel de Estado**: Métricas dinámicas (fase, entropía, perfection score, CPU)
+- 💬 **Chat Interactivo**: Conversación en tiempo real con base de conocimiento completa
+- 🎨 **Tema Futurista**: Diseño oscuro con acentos verdes neón y efectos de luz
+- 📚 **Resolución Inmediata**: El agente tiene acceso a toda la documentación del proyecto
+
+**Iniciar el asistente:**
+```bash
+cd agent
+./run.sh gui-server
+# Abre: http://localhost:8080
+```
+
+Ver [agent/README.md](agent/README.md) para más información.
+
 ## 🎯 Concepto Principal
 
 F3-OS está inspirado en la metáfora gráfica de **"enrollar 3 hilos de fibra óptica en su cartucho en reversa"**, lo cual se traduce técnicamente en:
@@ -153,32 +181,6 @@ Esto generará `kernel.bin` en la raíz del proyecto.
 - ✅ Multiboot header para bootloaders
 - ✅ Scripts de build y ejecución
 - ✅ **Agente Gobernante AI** con interfaz GUI completa
-
-## 🤖 Agente Gobernante F3-OS
-
-F3-OS incluye un agente AI especializado que gobierna el desarrollo del proyecto, manteniendo coherencia con el modelo F3. El agente incluye una interfaz web completa con diseño futurista.
-
-### Interfaz del Asistente
-
-![F3-OS Assistant Interface](agent/gui_web/screenshot.png)
-
-*Interfaz del asistente con indicador de vida del agente (arriba derecha), panel de estado en tiempo real, y chat interactivo. Diseño futurista estilo Star Wars/Fórmula 1.*
-
-**Características de la Interfaz:**
-- 🟢 **Indicador de Vida del Agente**: Reloj circular estilo F1/Star Wars que muestra tiempo activo
-- 📊 **Panel de Estado**: Métricas en tiempo real (fase, entropía, perfection score, CPU)
-- 💬 **Chat Interactivo**: Conversación en tiempo real con el asistente
-- 🎨 **Tema Futurista**: Diseño oscuro con acentos verdes neón
-- 📚 **Base de Conocimiento Completa**: Acceso a toda la documentación del proyecto
-
-**Para usar el asistente:**
-```bash
-cd agent
-./run.sh gui-server
-# Luego abre: http://localhost:8080
-```
-
-Ver [agent/README.md](agent/README.md) para más información sobre el agente.
 
 **Problemas Conocidos**:
 - ⚠️ GRUB puede tener problemas detectando el Multiboot header (usar opciones de debugging)
