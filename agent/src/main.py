@@ -182,6 +182,9 @@ def start_gui_server(config: Dict, data_dir: Path, port: int = 8080):
     
     print("✅ Base de conocimiento completa cargada - Resolución inmediata habilitada")
     
+    # Iniciar trabajador autónomo
+    governance.autonomous_worker.start()
+    
     server = GUIServer(gui, port=port)
     server.start()
     
@@ -194,6 +197,7 @@ def start_gui_server(config: Dict, data_dir: Path, port: int = 8080):
             time.sleep(1)
     except KeyboardInterrupt:
         print("\n🛑 Deteniendo servidor...")
+        governance.autonomous_worker.stop()
         server.stop()
         resource_manager.stop_monitoring()
 

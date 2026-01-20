@@ -17,6 +17,7 @@ from .resource_manager import ResourceManager, ThrottledOperation
 from .internet_learning import InternetLearner, NetworkManager
 from .agent_rules import AgentRulesSystem
 from .autonomous_executor import AutonomousExecutor
+from .autonomous_worker import AutonomousWorker
 
 
 class GovernanceCore:
@@ -51,6 +52,9 @@ class GovernanceCore:
             resource_manager=self.resource_manager
         )
         
+        # Trabajador autónomo (ejecuta tareas periódicamente)
+        self.autonomous_worker = AutonomousWorker(self, config)
+        
         # Aplicar límites de recursos desde reglas
         rule_limits = self.agent_rules.get_resource_limits()
         if rule_limits:
@@ -67,6 +71,12 @@ class GovernanceCore:
         # Iniciar monitoreo de recursos
         self.resource_manager.start_monitoring()
         self.network_manager.start_monitoring()
+        
+        # Registrar actividad inicial
+        from .activity_stream import log_success, log_thinking
+        log_success("Sistema de reglas cargado - El agente sabe qué hacer, dónde parar, dónde buscar y cómo implementar")
+        log_success("Ejecutor autónomo habilitado - El agente puede implementar código automáticamente")
+        log_thinking("SISTEMA 100% AUTÓNOMO ACTIVADO")
         
         logger.info("✅ Sistema de reglas cargado - El agente sabe qué hacer, dónde parar, dónde buscar y cómo implementar")
         logger.info("✅ Ejecutor autónomo habilitado - El agente puede implementar código automáticamente")

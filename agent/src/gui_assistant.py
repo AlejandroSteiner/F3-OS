@@ -305,6 +305,10 @@ class GUIAssistant:
             # Aprendizaje libre en internet (separado del entorno del usuario)
             logger.info(f"Aprendizaje en internet solicitado: {user_input}")
             
+            # Registrar actividad de pensamiento
+            from .activity_stream import log_thinking
+            log_thinking(f"Analizando solicitud de aprendizaje: {user_input}")
+            
             # Extraer query de aprendizaje
             learning_query = user_input
             if 'aprender' in learning_query.lower():
