@@ -94,3 +94,4 @@ Cuando F3-OS tenga GUI completa, se conectará automáticamente a:
 
 **Abre http://localhost:8080 en tu navegador y comienza a chatear.** 💬
 
+

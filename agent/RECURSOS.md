@@ -110,3 +110,4 @@ Con estos límites:
 - Throttling se aplica automáticamente en todas las operaciones
 - Configurable sin modificar código
 
+

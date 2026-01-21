@@ -105,3 +105,4 @@ Una vez que F3-OS esté corriendo en QEMU:
 
 **Para iniciar todo automáticamente: `./iniciar_sistema_completo.sh`**
 
+

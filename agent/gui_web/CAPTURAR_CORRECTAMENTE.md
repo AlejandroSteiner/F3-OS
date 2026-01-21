@@ -64,3 +64,4 @@ La imagen debe mostrar:
 - ✅ Input y botón de envío
 - ❌ NO debe incluir barras del sistema, otras ventanas, etc.
 
+

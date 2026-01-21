@@ -11,3 +11,4 @@ pub mod alloc_stub {
     // Estos no se usarán en main.rs donde alloc está disponible
 }
 
+

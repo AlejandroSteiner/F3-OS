@@ -88,3 +88,4 @@ class AutonomousWorker:
         # 5. Verificar si hay conocimiento nuevo para aprender
         # (Esto se puede expandir más adelante)
 
+

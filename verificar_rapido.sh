@@ -50,3 +50,4 @@ echo "✅ Verificación rápida completada"
 echo ""
 echo "Para verificación completa: ./verificar_sistema.sh"
 
+

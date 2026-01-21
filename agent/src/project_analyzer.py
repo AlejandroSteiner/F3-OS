@@ -268,3 +268,4 @@ class ProjectAnalyzer:
         
         return '\n\n'.join(summary_parts) if summary_parts else "No se pudo generar resumen."
 
+

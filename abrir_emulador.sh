@@ -75,3 +75,4 @@ fi
 echo "✅ Emulador iniciado"
 echo "La ventana de QEMU debería abrirse automáticamente"
 
+

@@ -123,3 +123,4 @@ Pero la **arquitectura está lista** para:
 
 *Última actualización: 2025*
 
+

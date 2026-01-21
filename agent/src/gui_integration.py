@@ -144,3 +144,4 @@ class AssistantAPI:
         """Obtiene estado para renderizado"""
         return self.gui.get_window_state()
 
+

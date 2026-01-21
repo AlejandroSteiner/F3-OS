@@ -144,3 +144,4 @@ El agente ahora:
 
 **El agente tiene total libertad para completar el propósito del proyecto F3-OS, respetando solo las reglas explícitas necesarias para proteger el núcleo sagrado y los recursos del sistema.**
 
+

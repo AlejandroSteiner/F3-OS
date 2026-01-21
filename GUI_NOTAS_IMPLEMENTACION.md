@@ -90,3 +90,4 @@ La arquitectura está **completa y lista**, solo necesita:
 
 *La arquitectura está lista. Solo necesita habilitar alloc para funcionalidad completa.*
 
+

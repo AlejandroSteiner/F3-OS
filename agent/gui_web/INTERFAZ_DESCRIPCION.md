@@ -100,3 +100,4 @@ Panel oscuro con borde verde neón que muestra:
 
 **Nota**: Esta descripción corresponde a la interfaz implementada con el estilo futurista completo, incluyendo el indicador de vida del agente y todos los efectos visuales.
 
+

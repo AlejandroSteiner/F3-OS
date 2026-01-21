@@ -159,3 +159,4 @@ class DevelopmentCycle:
         """Determina si se debe ser estricto (fase lógica o perfecta)"""
         return self.state.phase in (DevelopmentPhase.LOGICAL, DevelopmentPhase.PERFECT)
 
+

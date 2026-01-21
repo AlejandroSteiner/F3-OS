@@ -282,3 +282,4 @@ Si tienes dudas sobre si tu contribución es apropiada, abre un Issue con la eti
 
 *Última actualización: 2025*
 
+

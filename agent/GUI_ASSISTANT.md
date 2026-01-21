@@ -157,3 +157,4 @@ impl AssistantWindow {
 - Mantiene contexto del sistema F3
 - Historial de conversación persistente
 
+

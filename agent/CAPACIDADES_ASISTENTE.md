@@ -160,3 +160,4 @@ project_root: "/ruta/al/proyecto/f3-os"
 - [ ] Análisis de código fuente (Rust)
 - [ ] Generación de diagramas explicativos
 
+

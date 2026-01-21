@@ -82,3 +82,4 @@ Cualquier otra información que los revisores deban saber.
 - Cambios conceptuales requieren discusión previa
 - Respeta el modelo F3 y el vocabulario del proyecto
 
+

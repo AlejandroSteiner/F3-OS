@@ -419,3 +419,4 @@ class ProjectKnowledgeBase:
             if comp.relationships
         }
 
+
