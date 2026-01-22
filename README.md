@@ -4,220 +4,220 @@
 [![Rust](https://img.shields.io/badge/Rust-1.70+-orange.svg)](https://www.rust-lang.org/)
 [![Architecture](https://img.shields.io/badge/Architecture-x86__64-green.svg)](https://en.wikipedia.org/wiki/X86-64)
 
-**F3-OS** es un sistema operativo experimental de código abierto basado en un modelo innovador de **3 hilos (threads) fundamentales** que se fusionan en un **embudo (funnel)** central, creando un flujo de retroalimentación adaptativo que gobierna la planificación, memoria y ejecución del sistema.
+**F3-OS** is an experimental open-source operating system based on an innovative model of **3 fundamental threads** that merge into a central **funnel**, creating an adaptive feedback flow that governs system scheduling, memory, and execution.
 
-> **⚠️ IMPORTANTE**: Lee el [MANIFIESTO.md](MANIFIESTO.md) antes de contribuir. F3-OS no es un sistema operativo tradicional. Es un experimento cognitivo a nivel kernel con reglas y filosofía específicas.
+> **⚠️ IMPORTANT**: Read [MANIFESTO.md](MANIFESTO.md) before contributing. F3-OS is not a traditional operating system. It is a cognitive experiment at the kernel level with specific rules and philosophy.
 
-## Agente Gobernante AI - Interfaz GUI
+## Governing AI Agent - GUI Interface
 
-F3-OS incluye un **agente AI especializado** que gobierna el desarrollo del proyecto y actúa como asistente interactivo para los usuarios. La interfaz presenta un diseño futurista estilo Star Wars/Fórmula 1.
+F3-OS includes a **specialized AI agent** that governs project development and acts as an interactive assistant for users. The interface features a futuristic Star Wars/Formula 1 style design.
 
 <div align="center">
 
 ![F3-OS Assistant Interface](https://raw.githubusercontent.com/AlejandroSteiner/F3-OS/main/agent/gui_web/screenshot.png)
 
-*Interfaz del asistente con indicador de vida del agente (arriba derecha), panel de estado en tiempo real, y chat interactivo*
+*Assistant interface with agent life indicator (top right), real-time status panel, and interactive chat*
 
 </div>
 
-**Características principales:**
-- 🟢 **Indicador de Vida del Agente**: Reloj circular estilo F1/Star Wars con tiempo activo en tiempo real
-- 📊 **Panel de Estado**: Métricas dinámicas (fase, entropía, perfection score, CPU)
-- 💬 **Chat Interactivo**: Conversación en tiempo real con base de conocimiento completa
-- 🎨 **Tema Futurista**: Diseño oscuro con acentos verdes neón y efectos de luz
-- 📚 **Resolución Inmediata**: El agente tiene acceso a toda la documentación del proyecto
+**Main features:**
+- 🟢 **Agent Life Indicator**: Circular F1/Star Wars style clock with real-time active time
+- 📊 **Status Panel**: Dynamic metrics (phase, entropy, perfection score, CPU)
+- 💬 **Interactive Chat**: Real-time conversation with complete knowledge base
+- 🎨 **Futuristic Theme**: Dark design with neon green accents and light effects
+- 📚 **Immediate Resolution**: The agent has access to all project documentation
 
-**Iniciar el asistente:**
+**Start the assistant:**
 ```bash
 cd agent
 ./run.sh gui-server
-# Abre: http://localhost:8080
+# Open: http://localhost:8080
 ```
 
-Ver [agent/README.md](agent/README.md) para más información.
+See [agent/README.md](agent/README.md) for more information.
 
-## Concepto Principal
+## Main Concept
 
-F3-OS está inspirado en la metáfora gráfica de **"enrollar 3 hilos de fibra óptica en su cartucho en reversa"**, lo cual se traduce técnicamente en:
+F3-OS is inspired by the graphic metaphor of **"winding 3 optical fiber threads into their cartridge in reverse"**, which technically translates to:
 
-- **3 Hilos Fundamentales**: CPU (Executor), RAM (Context Keeper), MEM (Synthesizer)
-- **Embudo Central (F3 Core)**: Recibe, comprime y sintetiza flujos de los 3 hilos
-- **Retropropagación Inversa**: El estado final reescribe decisiones anteriores
-- **Ciclo Adaptativo**: Lógico → Ilógico → Síntesis → Perfecto
+- **3 Fundamental Threads**: CPU (Executor), RAM (Context Keeper), MEM (Synthesizer)
+- **Central Funnel (F3 Core)**: Receives, compresses, and synthesizes flows from the 3 threads
+- **Inverse Backpropagation**: The final state rewrites previous decisions
+- **Adaptive Cycle**: Logical → Illogical → Synthesis → Perfect
 
-## Arquitectura
+## Architecture
 
-### 3 Hilos Fundamentales
+### 3 Fundamental Threads
 
 1. **CPU Thread (Executor)**
-   - Ejecuta tareas
-   - Mide ciclos reales
-   - Reporta latencias
+   - Executes tasks
+   - Measures real cycles
+   - Reports latencies
 
 2. **RAM Thread (Context Keeper)**
-   - Mantiene estados parciales
-   - Crea snapshots comprimidos
-   - Decide qué descartar
+   - Maintains partial states
+   - Creates compressed snapshots
+   - Decides what to discard
 
 3. **MEM Thread (Synthesizer)**
-   - Memoria semántica
-   - Resume patrones y resultados
-   - Proporciona retroalimentación
+   - Semantic memory
+   - Summarizes patterns and results
+   - Provides feedback
 
 ### F3 Core (Funnel)
 
-El corazón del sistema que:
-- Recibe flujos de los 3 hilos
-- Comprime estado
-- Genera retroalimentación estructural
-- Modifica planificación y memoria dinámicamente
+The heart of the system that:
+- Receives flows from the 3 threads
+- Compresses state
+- Generates structural feedback
+- Dynamically modifies scheduling and memory
 
-### Ciclo de Fases del Sistema
+### System Phase Cycle
 
-F3-OS opera en un ciclo de 4 fases:
+F3-OS operates in a 4-phase cycle:
 
-1. **LÓGICO**: Ordenado, predecible, baja entropía
-2. **ILÓGICO**: Desorden intencional, exploración, alta entropía
-3. **SÍNTESIS**: El embudo concentra, reorganiza, entropía disminuye
-4. **PERFECTO**: Estado optimizado, aplica retroalimentación refinada
+1. **LOGICAL**: Ordered, predictable, low entropy
+2. **ILLOGICAL**: Intentional disorder, exploration, high entropy
+3. **SYNTHESIS**: The funnel concentrates, reorganizes, entropy decreases
+4. **PERFECT**: Optimized state, applies refined feedback
 
-Este ciclo se repite continuamente, mejorando el sistema en cada iteración.
+This cycle repeats continuously, improving the system with each iteration.
 
-## 📁 Estructura del Proyecto
+## 📁 Project Structure
 
 ```
 f3-os/
-├── kernel/                 # Código fuente del kernel
+├── kernel/                 # Kernel source code
 │   ├── src/
-│   │   ├── main.rs        # Punto de entrada del kernel
-│   │   ├── vga.rs         # Driver de VGA para salida de texto
-│   │   ├── f3/            # Módulos F3 Core
+│   │   ├── main.rs        # Kernel entry point
+│   │   ├── vga.rs         # VGA driver for text output
+│   │   ├── f3/            # F3 Core modules
 │   │   │   ├── mod.rs
 │   │   │   ├── cpu.rs     # CPU Thread
 │   │   │   ├── ram.rs     # RAM Thread
 │   │   │   ├── mem.rs     # MEM Thread
 │   │   │   └── core.rs    # F3 Core (Funnel)
-│   │   ├── arch/          # Código específico de arquitectura
+│   │   ├── arch/          # Architecture-specific code
 │   │   │   └── x86_64.rs
 │   │   └── boot.rs        # Multiboot header
-│   ├── linker.ld          # Script del linker
-│   └── Cargo.toml         # Configuración de Rust
-├── build.sh               # Script para compilar el kernel
-├── run.sh                 # Script para ejecutar en QEMU (boot directo)
-├── create_grub_iso.sh     # Script para crear ISO booteable con GRUB
-├── run_iso.sh             # Script para ejecutar ISO en QEMU
-└── README.md              # Este archivo
+│   ├── linker.ld          # Linker script
+│   └── Cargo.toml         # Rust configuration
+├── build.sh               # Script to compile the kernel
+├── run.sh                 # Script to run in QEMU (direct boot)
+├── create_grub_iso.sh     # Script to create bootable ISO with GRUB
+├── run_iso.sh             # Script to run ISO in QEMU
+└── README.md              # This file
 ```
 
-## Inicio Rápido
+## Quick Start
 
-### Requisitos
+### Requirements
 
 - **Rust** (nightly): `rustup toolchain install nightly`
 - **QEMU**: `sudo apt install -y qemu-system-x86`
 - **GRUB**: `sudo apt install -y grub-pc-bin grub-common xorriso mtools`
 - **LLVM/LLD**: `sudo apt install -y llvm lld`
 
-O instala todo de una vez:
+Or install everything at once:
 ```bash
-./INSTALAR_DEPENDENCIAS.sh
+./INSTALL_DEPENDENCIES.sh
 ```
 
-### Compilar
+### Compile
 
 ```bash
 ./build.sh
 ```
 
-Esto generará `kernel.bin` en la raíz del proyecto.
+This will generate `kernel.bin` in the project root.
 
-### Ejecutar
+### Run
 
-#### Opción 1: Boot Directo (no requiere ISO)
+#### Option 1: Direct Boot (no ISO required)
 ```bash
 ./run.sh
 ```
 
-#### Opción 2: ISO Booteable (más compatible)
+#### Option 2: Bootable ISO (more compatible)
 ```bash
-# Crear ISO
+# Create ISO
 ./create_grub_iso.sh
 
-# Ejecutar ISO
+# Run ISO
 ./run_iso.sh
 ```
 
-## 📖 Documentación
+## 📖 Documentation
 
-### Documentos Esenciales (Lee Primero)
+### Essential Documents (Read First)
 
-- **[MANIFIESTO.md](MANIFIESTO.md)**: ⭐ **OBLIGATORIO** - Qué es y qué NO es F3-OS
-- **[CONTRIBUTING.md](CONTRIBUTING.md)**: ⭐ **OBLIGATORIO** - Reglas de contribución
-- **[GOVERNANCE.md](GOVERNANCE.md)**: Estructura de gobierno y núcleo sagrado
-- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**: Código de conducta de la comunidad
-- **[ARQUITECTURA_COMPLETA.md](ARQUITECTURA_COMPLETA.md)**: Documentación completa de la arquitectura
-- **[REGLAS_LOGICA.md](REGLAS_LOGICA.md)**: Explicación del ciclo "Lógico → Ilógico → Síntesis → Perfecto"
+- **[MANIFESTO.md](MANIFESTO.md)**: ⭐ **MANDATORY** - What F3-OS is and is NOT
+- **[CONTRIBUTING.md](CONTRIBUTING.md)**: ⭐ **MANDATORY** - Contribution rules
+- **[GOVERNANCE.md](GOVERNANCE.md)**: Governance structure and sacred core
+- **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**: Community code of conduct
+- **[COMPLETE_ARCHITECTURE.md](COMPLETE_ARCHITECTURE.md)**: Complete architecture documentation
+- **[LOGIC_RULES.md](LOGIC_RULES.md)**: Explanation of the "Logical → Illogical → Synthesis → Perfect" cycle
 
-### Documentos Técnicos
+### Technical Documents
 
-- **[AGENTE_GOBERNANTE.md](AGENTE_GOBERNANTE.md)**: ⭐ Visión del agente AI gobernante del desarrollo
-- **[SEGURIDAD_Y_RESISTENCIA.md](SEGURIDAD_Y_RESISTENCIA.md)**: ⭐ Análisis de seguridad y resistencia a vulnerabilidades
-- **[INNOVACION_Y_VALOR.md](INNOVACION_Y_VALOR.md)**: Innovación y valor del sistema
-- **[GUIA_PRUEBAS_SEGURAS.md](GUIA_PRUEBAS_SEGURAS.md)**: Guía para pruebas seguras en QEMU
-- **[DEBUG_GRUB.md](DEBUG_GRUB.md)**: Troubleshooting de problemas con GRUB
-- **[SOLUCION_FINAL.md](SOLUCION_FINAL.md)**: Soluciones a problemas comunes
+- **[GOVERNING_AGENT.md](GOVERNING_AGENT.md)**: ⭐ Vision of the AI agent governing development
+- **[SECURITY_AND_RESILIENCE.md](SECURITY_AND_RESILIENCE.md)**: ⭐ Security analysis and vulnerability resistance
+- **[INNOVATION_AND_VALUE.md](INNOVATION_AND_VALUE.md)**: System innovation and value
+- **[SAFE_TESTING_GUIDE.md](SAFE_TESTING_GUIDE.md)**: Guide for safe testing in QEMU
+- **[DEBUG_GRUB.md](DEBUG_GRUB.md)**: Troubleshooting GRUB problems
+- **[FINAL_SOLUTION.md](FINAL_SOLUTION.md)**: Solutions to common problems
 
-### Estado Actual
+### Current Status
 
-**Versión**: 0.1.0 (Desarrollo inicial)
+**Version**: 0.1.0 (Initial development)
 
-**Estado**: ✅ Kernel funcional básico, sistema de fases implementado, arranque en QEMU (con algunas limitaciones)
+**Status**: ✅ Basic functional kernel, phase system implemented, boot in QEMU (with some limitations)
 
-**Funcionalidades Implementadas**:
-- ✅ Kernel básico en Rust (`#![no_std]`)
-- ✅ Driver VGA para salida de texto
-- ✅ Sistema F3 Core con 3 hilos
-- ✅ Ciclo de fases: Lógico → Ilógico → Síntesis → Perfecto
-- ✅ Multiboot header para bootloaders
-- ✅ Scripts de build y ejecución
-- ✅ **Agente Gobernante AI** con interfaz GUI completa
+**Implemented Features**:
+- ✅ Basic kernel in Rust (`#![no_std]`)
+- ✅ VGA driver for text output
+- ✅ F3 Core system with 3 threads
+- ✅ Phase cycle: Logical → Illogical → Synthesis → Perfect
+- ✅ Multiboot header for bootloaders
+- ✅ Build and execution scripts
+- ✅ **Governing AI Agent** with complete GUI interface
 
-**Problemas Conocidos**:
-- ⚠️ GRUB puede tener problemas detectando el Multiboot header (usar opciones de debugging)
-- ⚠️ Sistema se congela al intentar arrancar desde ISO (problema de bootloader)
+**Known Issues**:
+- ⚠️ GRUB may have problems detecting the Multiboot header (use debugging options)
+- ⚠️ System freezes when trying to boot from ISO (bootloader problem)
 
-**Próximos Pasos**:
-- [ ] Mejorar detección de Multiboot header en GRUB
-- [ ] Implementar scheduler adaptativo
-- [ ] Sistema de memoria dinámico
-- [ ] Drivers básicos (teclado, disco)
-- [ ] Sistema de archivos simple
+**Next Steps**:
+- [ ] Improve Multiboot header detection in GRUB
+- [ ] Implement adaptive scheduler
+- [ ] Dynamic memory system
+- [ ] Basic drivers (keyboard, disk)
+- [ ] Simple file system
 
-## 🔬 Desarrollo
+## 🔬 Development
 
-### Compilar el Kernel
+### Compile the Kernel
 
 ```bash
 cd /home/ktzchen/Documentos/f3-os
 ./build.sh
 ```
 
-El kernel se compila para el target `x86_64-unknown-none` usando Rust nightly y `build-std`.
+The kernel compiles for the `x86_64-unknown-none` target using Rust nightly and `build-std`.
 
-### Ejecutar en QEMU
+### Run in QEMU
 
 ```bash
-# Boot directo (requiere Multiboot header)
+# Direct boot (requires Multiboot header)
 ./run.sh
 
-# Desde ISO (requiere crear ISO primero)
+# From ISO (requires creating ISO first)
 ./create_grub_iso.sh
 ./run_iso.sh
 ```
 
 ### Debugging
 
-Para debugging en QEMU:
+For debugging in QEMU:
 
 ```bash
 qemu-system-x86_64 \
@@ -226,64 +226,64 @@ qemu-system-x86_64 \
   -m 256M \
   -no-reboot \
   -serial stdio \
-  -s -S  # Para conectar con GDB
+  -s -S  # To connect with GDB
 ```
 
-## 📝 Regla Fundamental del Sistema
+## 📝 Fundamental System Rule
 
-**"Lógico pero ilógico en su estructura hasta volver a ser lógico y perfecto de nuevo"**
+**"Logical but illogical in its structure until it becomes logical and perfect again"**
 
-Esta regla se implementa como el ciclo de fases del sistema:
-1. Empieza ordenado y predecible (LÓGICO)
-2. Introduce desorden intencional para explorar (ILÓGICO)
-3. El embudo sintetiza y reorganiza (SÍNTESIS)
-4. El sistema se optimiza y vuelve al orden mejorado (PERFECTO)
+This rule is implemented as the system's phase cycle:
+1. Starts ordered and predictable (LOGICAL)
+2. Introduces intentional disorder to explore (ILLOGICAL)
+3. The funnel synthesizes and reorganizes (SYNTHESIS)
+4. The system optimizes and returns to improved order (PERFECT)
 
-Este ciclo se repite continuamente, mejorando el sistema en cada iteración.
+This cycle repeats continuously, improving the system with each iteration.
 
-## Contribuir
+## Contributing
 
-**Antes de contribuir, lee**:
-- [MANIFIESTO.md](MANIFIESTO.md) - Filosofía y principios del proyecto
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Reglas estrictas de contribución
-- [AGENTE_GOBERNANTE.md](AGENTE_GOBERNANTE.md) - Cómo el agente AI gobierna el desarrollo
+**Before contributing, read**:
+- [MANIFESTO.md](MANIFESTO.md) - Project philosophy and principles
+- [CONTRIBUTING.md](CONTRIBUTING.md) - Strict contribution rules
+- [GOVERNING_AGENT.md](GOVERNING_AGENT.md) - How the AI agent governs development
 
-F3-OS tiene reglas específicas:
-- PRs pequeños (máximo 200-300 líneas)
-- Cambios conceptuales requieren discusión previa
-- Nada de features "porque sí"
-- Respeta el vocabulario y modelo F3
+F3-OS has specific rules:
+- Small PRs (maximum 200-300 lines)
+- Conceptual changes require prior discussion
+- No features "just because"
+- Respect F3 vocabulary and model
 
-** El Agente Gobernante**: F3-OS tiene un agente AI que evalúa automáticamente los PRs según el modelo F3. Ver [agent/README.md](agent/README.md) para más información.
+**The Governing Agent**: F3-OS has an AI agent that automatically evaluates PRs according to the F3 model. See [agent/README.md](agent/README.md) for more information.
 
-**No contribuyas si**:
-- Buscas un proyecto "fácil" o tradicional
-- No estás dispuesto a entender el modelo conceptual
-- Quieres agregar compatibilidad POSIX o features genéricas
+**Don't contribute if**:
+- You're looking for an "easy" or traditional project
+- You're not willing to understand the conceptual model
+- You want to add POSIX compatibility or generic features
 
-**Sí contribuye si**:
-- Te interesa experimentación en arquitectura de sistemas
-- Entiendes y respetas el modelo F3
-- Estás dispuesto a cuestionar y ser cuestionado
+**Do contribute if**:
+- You're interested in experimentation in system architecture
+- You understand and respect the F3 model
+- You're willing to question and be questioned
 
-Ver [CONTRIBUTING.md](CONTRIBUTING.md) para el proceso completo.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete process.
 
-## Licencia
+## License
 
-Este proyecto está licenciado bajo la Licencia GPL-3.0 - ver el archivo [LICENSE](LICENSE) para más detalles.
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
 
-## Autor
+## Author
 
 **AlejandroSteiner**
 
-## Agradecimientos
+## Acknowledgments
 
-- Rust community por el excelente lenguaje
-- QEMU project por el emulador
-- GRUB project por el bootloader
-- Comunidad de OSDev por recursos y conocimiento
+- Rust community for the excellent language
+- QEMU project for the emulator
+- GRUB project for the bootloader
+- OSDev community for resources and knowledge
 
-## Recursos
+## Resources
 
 - [OSDev Wiki](https://wiki.osdev.org/)
 - [Writing an OS in Rust](https://os.phil-opp.com/)
@@ -291,27 +291,27 @@ Este proyecto está licenciado bajo la Licencia GPL-3.0 - ver el archivo [LICENS
 
 ---
 
-## ⚠️ Advertencias Importantes
+## ⚠️ Important Warnings
 
-### Lo que F3-OS NO es:
+### What F3-OS is NOT:
 
-- ❌ **NO es un sistema operativo de producción** - Es experimental
-- ❌ **NO busca compatibilidad POSIX** - Tiene su propio modelo
-- ❌ **NO es un proyecto tradicional** - Tiene reglas y filosofía específicas
-- ❌ **NO es para todos** - Requiere entender el modelo conceptual
+- ❌ **NOT a production operating system** - It's experimental
+- ❌ **NOT seeking POSIX compatibility** - It has its own model
+- ❌ **NOT a traditional project** - It has specific rules and philosophy
+- ❌ **NOT for everyone** - Requires understanding the conceptual model
 
-### Lo que F3-OS SÍ es:
+### What F3-OS IS:
 
-- ✅ **Es un experimento cognitivo a nivel kernel**
-- ✅ **Es código abierto** (GPL-3.0)
-- ✅ **Es un laboratorio de ideas** sobre retroalimentación adaptativa
-- ✅ **Es para quienes buscan experimentación** en arquitectura de sistemas
+- ✅ **It's a cognitive experiment at the kernel level**
+- ✅ **It's open source** (GPL-3.0)
+- ✅ **It's a laboratory of ideas** about adaptive feedback
+- ✅ **It's for those seeking experimentation** in system architecture
 
-**Lee el [MANIFIESTO.md](MANIFIESTO.md) para entender completamente qué es F3-OS.**
+**Read [MANIFESTO.md](MANIFESTO.md) to fully understand what F3-OS is.**
 
 ---
 
-**⚠️ Advertencia**: Este es un proyecto experimental. No use en producción. Úsalo bajo tu propio riesgo.
+**⚠️ Warning**: This is an experimental project. Do not use in production. Use at your own risk.
 
-**⭐ Si te gusta este proyecto, considera darle una estrella en GitHub!**
+**⭐ If you like this project, consider giving it a star on GitHub!**
 DONATIONS - PEPE ETH CONTRACT: 0xf700d6d8fe58421e5937b8a64696775e1449242e
