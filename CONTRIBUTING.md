@@ -1,287 +1,283 @@
-# Guía de Contribución a F3-OS
+# F3-OS Contribution Guide
 
-## Antes de Contribuir
+## Before Contributing
 
-**Lee esto primero**: F3-OS no es un proyecto tradicional. Tiene reglas estrictas y un modelo conceptual que debe respetarse.
+**Read this first**: F3-OS is not a traditional project. It has strict rules and a conceptual model that must be respected.
 
-Si no has leído el [MANIFIESTO.md](MANIFIESTO.md), hazlo ahora. Si no entiendes el modelo F3, lee [ARQUITECTURA_COMPLETA.md](ARQUITECTURA_COMPLETA.md) y [REGLAS_LOGICA.md](REGLAS_LOGICA.md).
-
----
-
-## Reglas Fundamentales
-
-### 1. PRs Pequeños
-
-**No envíes PRs masivos.**
-
-- Un PR debe resolver un problema específico
-- Máximo 200-300 líneas de cambios
-- Si necesitas hacer cambios grandes, divídelos en múltiples PRs
-
-**Por qué**: Facilita la revisión y mantiene el foco conceptual.
-
-### 2. Cambios Conceptuales → Discusión Primero
-
-**Si tu cambio afecta el modelo F3, discútelo antes de codificar.**
-
-Esto incluye:
-- Modificaciones al F3 Core
-- Cambios en los 3 hilos (CPU/RAM/MEM)
-- Alteraciones al ciclo de fases
-- Cambios en la retroalimentación inversa
-
-**Cómo discutir**:
-1. Abre un Issue con la etiqueta `[CONCEPTUAL]`
-2. Explica el problema que resuelve
-3. Justifica por qué el cambio es necesario
-4. Espera feedback antes de implementar
-
-**Por qué**: El núcleo conceptual de F3-OS se custodia con cuidado. No todo se vota, pero todo se discute.
-
-### 3. Nada de Features "Porque Sí"
-
-**Cada cambio debe tener justificación.**
-
-Antes de agregar una feature, pregúntate:
-- ¿Resuelve un problema real del modelo F3?
-- ¿Se alinea con la filosofía del proyecto?
-- ¿Es necesaria ahora o puede esperar?
-
-Si la respuesta es "sería cool tener esto", probablemente no deberías agregarlo.
-
-**Por qué**: F3-OS no busca ser un "kitchen sink". Busca coherencia conceptual.
-
-### 4. Respeta el Vocabulario del Proyecto
-
-F3-OS tiene términos específicos:
-- **Hilos** (no "threads" en el sentido tradicional)
-- **Embudo** (Funnel, F3 Core)
-- **Síntesis** (no "promedio" o "agregación")
-- **Retroalimentación inversa** (enrollado inverso)
-- **Fases**: Lógico, Ilógico, Síntesis, Perfecto
-
-Usa estos términos correctamente. No los reemplaces con sinónimos genéricos.
-
-**Por qué**: El vocabulario define el modelo mental. Cambiarlo confunde.
+If you haven't read [MANIFESTO.md](MANIFESTO.md), do it now. If you don't understand the F3 model, read [COMPLETE_ARCHITECTURE.md](COMPLETE_ARCHITECTURE.md) and [LOGIC_RULES.md](LOGIC_RULES.md).
 
 ---
 
-## Proceso de Contribución
+## Fundamental Rules
 
-### Paso 1: Fork y Clone
+### 1. Small PRs
+
+**Don't send massive PRs.**
+
+- A PR should solve a specific problem
+- Maximum 200-300 lines of changes
+- If you need to make large changes, split them into multiple PRs
+
+**Why**: Facilitates review and maintains conceptual focus.
+
+### 2. Conceptual Changes → Discussion First
+
+**If your change affects the F3 model, discuss it before coding.**
+
+This includes:
+- Modifications to F3 Core
+- Changes to the 3 threads (CPU/RAM/MEM)
+- Alterations to the phase cycle
+- Changes to inverse feedback
+
+**How to discuss**:
+1. Open an Issue with the `[CONCEPTUAL]` label
+2. Explain the problem it solves
+3. Justify why the change is necessary
+4. Wait for feedback before implementing
+
+**Why**: The conceptual core of F3-OS is carefully guarded. Not everything is voted on, but everything is discussed.
+
+### 3. No Features "Just Because"
+
+**Every change must have justification.**
+
+Before adding a feature, ask yourself:
+- Does it solve a real problem of the F3 model?
+- Does it align with the project philosophy?
+- Is it necessary now or can it wait?
+
+If the answer is "it would be cool to have this", you probably shouldn't add it.
+
+**Why**: F3-OS doesn't seek to be a "kitchen sink". It seeks conceptual coherence.
+
+### 4. Respect Project Vocabulary
+
+F3-OS has specific terms:
+- **Threads** (not "threads" in the traditional sense)
+- **Funnel** (Funnel, F3 Core)
+- **Synthesis** (not "average" or "aggregation")
+- **Inverse feedback** (reverse winding)
+- **Phases**: Logical, Illogical, Synthesis, Perfect
+
+Use these terms correctly. Don't replace them with generic synonyms.
+
+**Why**: Vocabulary defines the mental model. Changing it confuses.
+
+---
+
+## Contribution Process
+
+### Step 1: Fork and Clone
 
 ```bash
-git clone https://github.com/tu-usuario/f3-os.git
+git clone https://github.com/your-username/f3-os.git
 cd f3-os
 ```
 
-### Paso 2: Crea una Rama
+### Step 2: Create a Branch
 
 ```bash
-git checkout -b feature/descripcion-corta
-# o
-git checkout -b fix/descripcion-corta
+git checkout -b feature/short-description
+# or
+git checkout -b fix/short-description
 ```
 
-**Nomenclatura**:
-- `feature/`: Nueva funcionalidad
-- `fix/`: Corrección de bug
-- `docs/`: Solo documentación
-- `refactor/`: Refactorización sin cambio funcional
+**Nomenclature**:
+- `feature/`: New functionality
+- `fix/`: Bug fix
+- `docs/`: Documentation only
+- `refactor/`: Refactoring without functional change
 
-### Paso 3: Desarrolla
+### Step 3: Develop
 
-- Sigue las convenciones de código Rust
-- Comenta código complejo
-- Mantén PRs pequeños
-- Prueba tus cambios (si es posible en el estado actual)
+- Follow Rust code conventions
+- Comment complex code
+- Keep PRs small
+- Test your changes (if possible in current state)
 
-### Paso 4: Commit
+### Step 4: Commit
 
 ```bash
-git commit -m "tipo: descripción corta
+git commit -m "type: short description
 
-Descripción más detallada si es necesario.
+More detailed description if necessary.
 
 Refs: #issue-number"
 ```
 
-**Tipos de commit**:
-- `feat`: Nueva feature
-- `fix`: Corrección de bug
-- `docs`: Documentación
-- `refactor`: Refactorización
+**Commit types**:
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `refactor`: Refactoring
 - `test`: Tests
-- `chore`: Mantenimiento
+- `chore`: Maintenance
 
-### Paso 5: Push y PR
+### Step 5: Push and PR
 
 ```bash
-git push origin feature/descripcion-corta
+git push origin feature/short-description
 ```
 
-Luego abre un Pull Request en GitHub.
+Then open a Pull Request on GitHub.
 
 ---
 
-## Estructura del Pull Request
+## Pull Request Structure
 
-### Título
+### Title
 
-Debe ser claro y descriptivo:
-- ✅ `feat: agregar medición de latencia en CPU Thread`
-- ❌ `cambios`
-- ❌ `mejoras varias`
+Must be clear and descriptive:
+- ✅ `feat: add latency measurement in CPU Thread`
+- ❌ `changes`
+- ❌ `various improvements`
 
-### Descripción
+### Description
 
-**Obligatorio** incluir:
+**Mandatory** to include:
 
-1. **¿Qué cambia?** (descripción breve)
-2. **¿Por qué?** (justificación)
-3. **¿Cómo?** (si es relevante)
-4. **¿Afecta el modelo F3?** (sí/no y explicación)
+1. **What changes?** (brief description)
+2. **Why?** (justification)
+3. **How?** (if relevant)
+4. **Does it affect the F3 model?** (yes/no and explanation)
 
-### Ejemplo de Descripción
+### Description Example
 
 ```markdown
-## ¿Qué cambia?
-Agrega medición de latencia promedio en el CPU Thread.
+## What changes?
+Adds average latency measurement in CPU Thread.
 
-## ¿Por qué?
-El CPU Thread actualmente solo reporta latencia del último ciclo. 
-Necesitamos latencia promedio para mejor síntesis en el F3 Core.
+## Why?
+CPU Thread currently only reports latency of the last cycle. 
+We need average latency for better synthesis in F3 Core.
 
-## ¿Cómo?
-Agrega campo `avg_latency` a `CpuFlow` y calcula promedio 
-en cada ciclo.
+## How?
+Adds `avg_latency` field to `CpuFlow` and calculates average 
+in each cycle.
 
-## ¿Afecta el modelo F3?
-No. Solo mejora la métrica que ya existe. No cambia el ciclo 
-de fases ni la síntesis.
+## Does it affect the F3 model?
+No. Only improves the metric that already exists. Doesn't change the phase 
+cycle or synthesis.
 ```
 
 ---
 
-## El Núcleo Sagrado
+## The Sacred Core
 
-**Estos componentes requieren discusión previa obligatoria:**
+**These components require mandatory prior discussion:**
 
 ### F3 Core (`kernel/src/f3/core.rs`)
-- Cambios a `process_funnel()`
-- Modificaciones al ciclo de fases
-- Cambios en `apply_feedback()`
-- Alteraciones a la lógica de síntesis
+- Changes to `process_funnel()`
+- Modifications to phase cycle
+- Changes to `apply_feedback()`
+- Alterations to synthesis logic
 
-### Los 3 Hilos
+### The 3 Threads
 - `kernel/src/f3/cpu.rs` - CPU Thread
 - `kernel/src/f3/ram.rs` - RAM Thread  
 - `kernel/src/f3/mem.rs` - MEM Thread
 
-**Cambios estructurales** (no solo mejoras de implementación) requieren Issue previo.
+**Structural changes** (not just implementation improvements) require prior Issue.
 
-### El Ciclo de Fases
-- Modificar `SystemPhase`
-- Cambiar transiciones entre fases
-- Alterar duración de fases
-- Modificar lógica de entropía
-
----
-
-## Código de Conducta
-
-### Respeto
-
-- Respeta las opiniones de otros
-- Cuestiona ideas, no personas
-- Sé constructivo en críticas
-
-### Paciencia
-
-- Las discusiones conceptuales pueden tomar tiempo
-- No todos los PRs se aceptan
-- Aprende de los rechazos
-
-### Coherencia
-
-- Mantén el foco en el modelo F3
-- No intentes convertir F3-OS en otro proyecto
-- Respeta la filosofía del proyecto
+### The Phase Cycle
+- Modify `SystemPhase`
+- Change transitions between phases
+- Alter phase duration
+- Modify entropy logic
 
 ---
 
-## Revisión de PRs
+## Code of Conduct
 
-### Criterios de Aceptación
+### Respect
 
-Un PR se acepta si:
+- Respect others' opinions
+- Question ideas, not people
+- Be constructive in criticism
 
-1. ✅ Resuelve un problema real
-2. ✅ Se alinea con el modelo F3
-3. ✅ No rompe funcionalidad existente
-4. ✅ Tiene justificación clara
-5. ✅ Código es legible y mantenible
-6. ✅ No afecta el núcleo sin discusión previa
+### Patience
 
-### Criterios de Rechazo
+- Conceptual discussions can take time
+- Not all PRs are accepted
+- Learn from rejections
 
-Un PR se rechaza si:
+### Coherence
 
-1. ❌ Agrega features sin justificación
-2. ❌ Modifica el núcleo sin discusión previa
-3. ❌ Rompe el modelo conceptual
-4. ❌ Es demasiado grande (divide en PRs más pequeños)
-5. ❌ No sigue las convenciones del proyecto
+- Keep focus on the F3 model
+- Don't try to turn F3-OS into another project
+- Respect the project philosophy
 
 ---
 
-## Preguntas Frecuentes
+## PR Review
 
-### ¿Puedo agregar un driver para X?
+### Acceptance Criteria
 
-Depende. Si es necesario para el desarrollo del kernel y se alinea con el modelo F3, sí. Si es "porque sería útil", probablemente no.
+A PR is accepted if:
 
-**Pregunta primero** abriendo un Issue.
+1. ✅ Solves a real problem
+2. ✅ Aligns with the F3 model
+3. ✅ Doesn't break existing functionality
+4. ✅ Has clear justification
+5. ✅ Code is readable and maintainable
+6. ✅ Doesn't affect core without prior discussion
 
-### ¿Puedo cambiar el ciclo de fases?
+### Rejection Criteria
 
-Solo si tienes una justificación conceptual sólida. **Discute primero** en un Issue con etiqueta `[CONCEPTUAL]`.
+A PR is rejected if:
 
-### ¿Puedo agregar compatibilidad POSIX?
+1. ❌ Adds features without justification
+2. ❌ Modifies core without prior discussion
+3. ❌ Breaks the conceptual model
+4. ❌ Is too large (split into smaller PRs)
+5. ❌ Doesn't follow project conventions
 
-No. F3-OS no busca compatibilidad POSIX. Es parte de su filosofía.
+---
 
-### ¿Cómo sé si mi cambio es "conceptual"?
+## Frequently Asked Questions
 
-Si afecta:
+### Can I add a driver for X?
+
+It depends. If it's necessary for kernel development and aligns with the F3 model, yes. If it's "because it would be useful", probably not.
+
+**Ask first** by opening an Issue.
+
+### Can I change the phase cycle?
+
+Only if you have a solid conceptual justification. **Discuss first** in an Issue with `[CONCEPTUAL]` label.
+
+### Can I add POSIX compatibility?
+
+No. F3-OS doesn't seek POSIX compatibility. It's part of its philosophy.
+
+### How do I know if my change is "conceptual"?
+
+If it affects:
 - F3 Core
-- Los 3 hilos (estructura, no implementación)
-- El ciclo de fases
-- La retroalimentación inversa
+- The 3 threads (structure, not implementation)
+- The phase cycle
+- Inverse feedback
 
-Entonces es conceptual. **Discute primero**.
-
----
-
-## Recursos
-
-- [MANIFIESTO.md](MANIFIESTO.md) - Filosofía del proyecto
-- [ARQUITECTURA_COMPLETA.md](ARQUITECTURA_COMPLETA.md) - Arquitectura técnica
-- [REGLAS_LOGICA.md](REGLAS_LOGICA.md) - Explicación del ciclo de fases
-- [README.md](README.md) - Documentación general
+Then it's conceptual. **Discuss first**.
 
 ---
 
-## Contacto
+## Resources
 
-Si tienes dudas sobre si tu contribución es apropiada, abre un Issue con la etiqueta `[QUESTION]`.
-
-**Recuerda**: F3-OS no es un proyecto tradicional. Respeta el modelo conceptual y contribuye con coherencia.
+- [MANIFESTO.md](MANIFESTO.md) - Project philosophy
+- [COMPLETE_ARCHITECTURE.md](COMPLETE_ARCHITECTURE.md) - Technical architecture
+- [LOGIC_RULES.md](LOGIC_RULES.md) - Phase cycle explanation
+- [README.md](README.md) - General documentation
 
 ---
 
-*Última actualización: 2025*
+## Contact
 
+If you have questions about whether your contribution is appropriate, open an Issue with the `[QUESTION]` label.
 
+**Remember**: F3-OS is not a traditional project. Respect the conceptual model and contribute with coherence.
 
+---
 
+*Last updated: 2025*

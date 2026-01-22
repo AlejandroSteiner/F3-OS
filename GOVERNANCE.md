@@ -1,216 +1,212 @@
-# Governance de F3-OS
+# F3-OS Governance
 
-## Principio Fundamental
+## Fundamental Principle
 
-**F3-OS no es un proyecto democrático en todos sus aspectos.**
+**F3-OS is not a democratic project in all its aspects.**
 
-Algunos componentes son "sagrados" y requieren custodia especial. Esto no es autoritarismo, es protección del núcleo conceptual.
+Some components are "sacred" and require special custody. This is not authoritarianism, it's protection of the conceptual core.
 
 ---
 
-## Estructura de Gobierno
+## Governance Structure
 
-### Núcleo Sagrado (Core Team)
+### Sacred Core (Core Team)
 
-El **núcleo sagrado** de F3-OS está custodiado por el fundador y mantenedores principales. Este núcleo incluye:
+The **sacred core** of F3-OS is guarded by the founder and main maintainers. This core includes:
 
 1. **F3 Core** (`kernel/src/f3/core.rs`)
-   - El embudo central y su lógica de síntesis
-   - El ciclo de fases (Lógico → Ilógico → Síntesis → Perfecto)
-   - La retroalimentación inversa
+   - The central funnel and its synthesis logic
+   - The phase cycle (Logical → Illogical → Synthesis → Perfect)
+   - Inverse feedback
 
-2. **Los 3 Hilos Estructurales**
+2. **The 3 Structural Threads**
    - CPU Thread (`kernel/src/f3/cpu.rs`)
    - RAM Thread (`kernel/src/f3/ram.rs`)
    - MEM Thread (`kernel/src/f3/mem.rs`)
 
-3. **El Modelo Conceptual**
-   - La filosofía "lógico → ilógico → síntesis → perfecto"
-   - El vocabulario del proyecto
-   - Las reglas fundamentales
+3. **The Conceptual Model**
+   - The "logical → illogical → synthesis → perfect" philosophy
+   - Project vocabulary
+   - Fundamental rules
 
-**Cambios al núcleo sagrado**:
-- Requieren discusión previa obligatoria (Issue con etiqueta `[CONCEPTUAL]`)
-- Deben tener justificación sólida
-- No se votan, se evalúan por coherencia conceptual
-- El mantenedor principal tiene veto final
+**Changes to the sacred core**:
+- Require mandatory prior discussion (Issue with `[CONCEPTUAL]` label)
+- Must have solid justification
+- Are not voted on, evaluated by conceptual coherence
+- Main maintainer has final veto
 
-### Áreas Abiertas
+### Open Areas
 
-Estas áreas son más flexibles y aceptan contribuciones con menos restricciones:
+These areas are more flexible and accept contributions with fewer restrictions:
 
-- Drivers (excepto si afectan el modelo F3)
-- Herramientas de build
-- Documentación (excepto el manifiesto)
-- Scripts de utilidad
+- Drivers (except if they affect the F3 model)
+- Build tools
+- Documentation (except the manifesto)
+- Utility scripts
 - Tests
 
-**Cambios en áreas abiertas**:
-- Siguen el proceso normal de PR
-- Requieren revisión pero no discusión previa obligatoria
-- Se evalúan por calidad técnica y alineación con el proyecto
+**Changes in open areas**:
+- Follow normal PR process
+- Require review but not mandatory prior discussion
+- Evaluated by technical quality and alignment with project
 
 ---
 
-## Proceso de Decisión
+## Decision Process
 
-### Niveles de Decisión
+### Decision Levels
 
-#### Nivel 1: Cambios Técnicos Menores
-- **Ejemplos**: Fixes de bugs, mejoras de implementación, refactorizaciones
-- **Proceso**: PR normal → Revisión → Merge
-- **Tiempo**: 1-3 días
+#### Level 1: Minor Technical Changes
+- **Examples**: Bug fixes, implementation improvements, refactorings
+- **Process**: Normal PR → Review → Merge
+- **Time**: 1-3 days
 
-#### Nivel 2: Cambios Técnicos Mayores
-- **Ejemplos**: Nuevos drivers, mejoras significativas de performance
-- **Proceso**: Issue de discusión → PR → Revisión extendida → Merge
-- **Tiempo**: 1-2 semanas
+#### Level 2: Major Technical Changes
+- **Examples**: New drivers, significant performance improvements
+- **Process**: Discussion Issue → PR → Extended review → Merge
+- **Time**: 1-2 weeks
 
-#### Nivel 3: Cambios Conceptuales
-- **Ejemplos**: Modificaciones al F3 Core, cambios en el ciclo de fases
-- **Proceso**: Issue `[CONCEPTUAL]` → Discusión profunda → Justificación → PR → Revisión exhaustiva → Decisión del mantenedor
-- **Tiempo**: 2-4 semanas (o más si es necesario)
+#### Level 3: Conceptual Changes
+- **Examples**: Modifications to F3 Core, changes to phase cycle
+- **Process**: `[CONCEPTUAL]` Issue → Deep discussion → Justification → PR → Exhaustive review → Maintainer decision
+- **Time**: 2-4 weeks (or more if necessary)
 
-### Criterios de Decisión
+### Decision Criteria
 
-Un cambio se acepta si:
+A change is accepted if:
 
-1. ✅ **Coherencia conceptual**: Se alinea con el modelo F3
-2. ✅ **Justificación sólida**: Resuelve un problema real
-3. ✅ **Calidad técnica**: Código limpio y mantenible
-4. ✅ **No rompe filosofía**: Respeta los principios del manifiesto
+1. ✅ **Conceptual coherence**: Aligns with the F3 model
+2. ✅ **Solid justification**: Solves a real problem
+3. ✅ **Technical quality**: Clean and maintainable code
+4. ✅ **Doesn't break philosophy**: Respects manifesto principles
 
-Un cambio se rechaza si:
+A change is rejected if:
 
-1. ❌ **Rompe el modelo**: Va contra la filosofía F3
-2. ❌ **Sin justificación**: "Sería cool" no es suficiente
-3. ❌ **Incompatible**: Busca convertir F3-OS en otro proyecto
-4. ❌ **Prematuro**: No es necesario ahora
-
----
-
-## Roles y Responsabilidades
-
-### Mantenedor Principal (Founder)
-
-**Responsabilidades**:
-- Custodiar el núcleo sagrado
-- Decisión final en cambios conceptuales
-- Mantener coherencia del proyecto
-- Revisar PRs críticos
-
-**Poderes**:
-- Veto en cambios al núcleo sagrado
-- Aceptar/rechazar PRs sin consenso
-- Modificar el manifiesto y governance
-
-### Mantenedores (Maintainers)
-
-**Responsabilidades**:
-- Revisar PRs
-- Mantener calidad del código
-- Guiar a contribuidores
-- Proponer mejoras
-
-**Poderes**:
-- Aprobar PRs en áreas abiertas
-- Sugerir cambios conceptuales
-- Etiquetar Issues
-
-### Contribuidores (Contributors)
-
-**Responsabilidades**:
-- Seguir las reglas de contribución
-- Respetar el modelo F3
-- Mantener calidad en sus PRs
-
-**Poderes**:
-- Abrir Issues y PRs
-- Participar en discusiones
-- Proponer mejoras
+1. ❌ **Breaks the model**: Goes against F3 philosophy
+2. ❌ **Without justification**: "Would be cool" is not enough
+3. ❌ **Incompatible**: Seeks to turn F3-OS into another project
+4. ❌ **Premature**: Not necessary now
 
 ---
 
-## Resolución de Conflictos
+## Roles and Responsibilities
 
-### Si hay desacuerdo:
+### Main Maintainer (Founder)
 
-1. **Discusión en Issue**: Abre un Issue con etiqueta `[DISCUSSION]`
-2. **Argumentos técnicos**: Presenta justificación basada en el modelo F3
-3. **Tiempo de reflexión**: No se toman decisiones apresuradas
-4. **Decisión final**: El mantenedor principal decide si no hay consenso
+**Responsibilities**:
+- Guard the sacred core
+- Final decision on conceptual changes
+- Maintain project coherence
+- Review critical PRs
 
-### Principios de resolución:
+**Powers**:
+- Veto on changes to sacred core
+- Accept/reject PRs without consensus
+- Modify manifesto and governance
 
-- **Coherencia > Consenso**: Mejor una decisión coherente que un compromiso que diluya el proyecto
-- **Modelo F3 > Opiniones personales**: Las decisiones se basan en el modelo, no en preferencias
-- **Respeto mutuo**: Se cuestionan ideas, no personas
+### Maintainers
 
----
+**Responsibilities**:
+- Review PRs
+- Maintain code quality
+- Guide contributors
+- Propose improvements
 
-## Transparencia
+**Powers**:
+- Approve PRs in open areas
+- Suggest conceptual changes
+- Label Issues
 
-### Lo que es público:
+### Contributors
 
-- ✅ Todas las decisiones se documentan en Issues/PRs
-- ✅ Las razones de rechazo se explican claramente
-- ✅ El proceso es transparente
+**Responsibilities**:
+- Follow contribution rules
+- Respect the F3 model
+- Maintain quality in their PRs
 
-### Lo que no es público:
-
-- ❌ Discusiones privadas (si las hay) se resumen públicamente
-- ❌ No hay "backroom deals"
-
----
-
-## Evolución del Governance
-
-Este documento puede evolucionar, pero:
-
-- Cualquier cambio requiere discusión pública
-- El núcleo sagrado siempre será custodiado
-- Los principios fundamentales no cambian sin justificación excepcional
-
----
-
-## Preguntas Frecuentes
-
-### ¿Por qué no es completamente democrático?
-
-Porque F3-OS tiene un modelo conceptual específico. La democracia sin límites diluye la visión. Linux funciona así (Linus tiene veto). Rust funciona así (el core team decide). F3-OS también.
-
-### ¿Puedo convertirme en mantenedor?
-
-Con el tiempo, si demuestras:
-- Comprensión profunda del modelo F3
-- Contribuciones consistentes y de calidad
-- Respeto por la filosofía del proyecto
-
-Pero no hay proceso formal aún. El proyecto es joven.
-
-### ¿Qué pasa si no estoy de acuerdo con una decisión?
-
-Puedes:
-1. Discutir en el Issue correspondiente
-2. Presentar argumentos técnicos
-3. Fork el proyecto (es código abierto)
-
-Pero el mantenedor principal tiene la decisión final en el núcleo sagrado.
+**Powers**:
+- Open Issues and PRs
+- Participate in discussions
+- Propose improvements
 
 ---
 
-## Conclusión
+## Conflict Resolution
 
-**F3-OS no es un experimento social. Es un experimento de sistema operativo cognitivo.**
+### If there's disagreement:
 
-El governance protege el núcleo conceptual mientras permite evolución en áreas abiertas. Esto no es autoritarismo, es coherencia.
+1. **Discussion in Issue**: Open an Issue with `[DISCUSSION]` label
+2. **Technical arguments**: Present justification based on F3 model
+3. **Reflection time**: No hasty decisions
+4. **Final decision**: Main maintainer decides if there's no consensus
 
-Si esto no te parece bien, F3-OS probablemente no es para ti. Y eso está bien.
+### Resolution principles:
+
+- **Coherence > Consensus**: Better a coherent decision than a compromise that dilutes the project
+- **F3 Model > Personal opinions**: Decisions are based on the model, not preferences
+- **Mutual respect**: Ideas are questioned, not people
 
 ---
 
-*Última actualización: 2025*
+## Transparency
 
+### What is public:
 
+- ✅ All decisions are documented in Issues/PRs
+- ✅ Rejection reasons are clearly explained
+- ✅ The process is transparent
 
+### What is not public:
 
+- ❌ Private discussions (if any) are summarized publicly
+- ❌ No "backroom deals"
+
+---
+
+## Governance Evolution
+
+This document can evolve, but:
+
+- Any change requires public discussion
+- The sacred core will always be guarded
+- Fundamental principles don't change without exceptional justification
+
+---
+
+## Frequently Asked Questions
+
+### Why isn't it completely democratic?
+
+Because F3-OS has a specific conceptual model. Unlimited democracy dilutes the vision. Linux works this way (Linus has veto). Rust works this way (core team decides). F3-OS too.
+
+### Can I become a maintainer?
+
+Over time, if you demonstrate:
+- Deep understanding of the F3 model
+- Consistent and quality contributions
+- Respect for project philosophy
+
+But there's no formal process yet. The project is young.
+
+### What if I disagree with a decision?
+
+You can:
+1. Discuss in the corresponding Issue
+2. Present technical arguments
+3. Fork the project (it's open source)
+
+But the main maintainer has final decision on the sacred core.
+
+---
+
+## Conclusion
+
+**F3-OS is not a social experiment. It's a cognitive operating system experiment.**
+
+Governance protects the conceptual core while allowing evolution in open areas. This is not authoritarianism, it's coherence.
+
+If this doesn't seem right to you, F3-OS is probably not for you. And that's fine.
+
+---
+
+*Last updated: 2025*
