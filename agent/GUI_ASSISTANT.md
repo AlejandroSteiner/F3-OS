@@ -158,3 +158,5 @@ impl AssistantWindow {
 - Historial de conversación persistente
 
 
+
+

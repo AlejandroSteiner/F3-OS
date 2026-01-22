@@ -82,3 +82,5 @@ El Multiboot header está correcto:
 El sistema se ejecutará en un entorno virtual completamente aislado, secundario al sistema Ubuntu.
 
 
+
+

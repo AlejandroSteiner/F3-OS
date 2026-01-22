@@ -215,3 +215,5 @@ Si ves esto, **el agente está funcionando correctamente**.
 **Recuerda: Si ya estás en `agent/`, solo ejecuta `./run.sh [comando]` sin hacer `cd agent` primero.**
 
 
+
+

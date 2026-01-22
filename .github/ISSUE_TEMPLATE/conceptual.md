@@ -80,3 +80,5 @@ Explica cómo este cambio:
 **Recuerda**: Los cambios conceptuales requieren discusión profunda. No implementes código hasta que esta discusión se resuelva.
 
 
+
+

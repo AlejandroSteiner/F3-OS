@@ -160,3 +160,5 @@ class DevelopmentCycle:
         return self.state.phase in (DevelopmentPhase.LOGICAL, DevelopmentPhase.PERFECT)
 
 
+
+

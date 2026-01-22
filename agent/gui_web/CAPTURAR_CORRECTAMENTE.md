@@ -65,3 +65,5 @@ La imagen debe mostrar:
 - ❌ NO debe incluir barras del sistema, otras ventanas, etc.
 
 
+
+

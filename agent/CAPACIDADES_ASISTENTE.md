@@ -161,3 +161,5 @@ project_root: "/ruta/al/proyecto/f3-os"
 - [ ] Generación de diagramas explicativos
 
 
+
+

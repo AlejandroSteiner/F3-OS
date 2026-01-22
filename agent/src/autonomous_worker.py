@@ -89,3 +89,5 @@ class AutonomousWorker:
         # (Esto se puede expandir más adelante)
 
 
+
+

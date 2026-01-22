@@ -82,3 +82,5 @@ python3 src/main.py
 *Última actualización: 2025*
 
 
+
+

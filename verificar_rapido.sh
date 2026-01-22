@@ -51,3 +51,5 @@ echo ""
 echo "Para verificación completa: ./verificar_sistema.sh"
 
 
+
+

@@ -212,3 +212,5 @@ Si esto no te parece bien, F3-OS probablemente no es para ti. Y eso está bien.
 *Última actualización: 2025*
 
 
+
+
