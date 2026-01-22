@@ -69,8 +69,10 @@ F3-OS is designed as an **autonomous system that acts as a real clone of the use
 **The assistant works with F3-OS's funnel system:**
 - Acts directly on any process in terms of hardware and pulse emission
 - The funnel system (F3 Core) processes commands and controls hardware directly
-- Optimizes hardware performance through custom drivers
-- Continuously improves system efficiency
+- **Frequency-based optimization**: F3-OS drivers decode sub-channels of frequencies in metals (copper, gold, etc.)
+- **Hardware optimization**: Uses available elements better through frequency analysis and sub-channel decoding
+- **Integration of new rules**: The funnel integrates new rules based on frequency synthesis
+- Continuously improves system efficiency through frequency-based feedback
 
 ### Civil Technology (No Credits)
 
@@ -119,6 +121,20 @@ F3-OS is inspired by the graphic metaphor of **"winding 3 optical fiber threads 
 - **Central Funnel (F3 Core)**: Receives, compresses, and synthesizes flows from the 3 threads
 - **Inverse Backpropagation**: The final state rewrites previous decisions
 - **Adaptive Cycle**: Logical → Illogical → Synthesis → Perfect
+
+### The Physical Foundation
+
+**The heart of F3-OS - the funnel of the 3 threads - is based on a real physical concept:**
+
+The F3 Core is fundamentally a **frequency synthesizer** that:
+- **Decodes sub-channels of frequencies** in metals (copper, gold, etc.)
+- **Integrates new rules** through frequency analysis
+- **Optimizes hardware** by understanding frequency characteristics in metallic conductors
+- **Uses available elements better** because F3-OS drivers work at the frequency level
+
+**F3-OS naturally uses available elements better because it implements F3-OS Drivers** - drivers that decode frequency sub-channels in metals and optimize hardware through frequency-based feedback.
+
+See [F3_CORE_FOUNDATION.md](F3_CORE_FOUNDATION.md) for the complete foundation explanation.
 
 ## Architecture
 
