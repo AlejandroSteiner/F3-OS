@@ -284,6 +284,54 @@ class ProjectKnowledgeBase:
                 return line[:max_length]
         return "Documentación del proyecto F3-OS"
     
+    def _extract_rules_from_cursorrules(self, text: str) -> List[str]:
+        """Extrae reglas del archivo .cursorrules (formato especial)"""
+        rules = []
+        lines = text.split('\n')
+        current_section = None
+        
+        for i, line in enumerate(lines):
+            line_stripped = line.strip()
+            
+            # Detectar secciones principales (##)
+            if line_stripped.startswith('##') and not line_stripped.startswith('###'):
+                if current_section:
+                    rules.append("")  # Separador entre secciones
+                current_section = line_stripped.replace('##', '').strip()
+                rules.append(f"=== {current_section} ===")
+            
+            # Detectar subsecciones (###)
+            elif line_stripped.startswith('###'):
+                subsection = line_stripped.replace('###', '').strip()
+                rules.append(f"\n--- {subsection} ---")
+            
+            # Detectar reglas importantes (✅, ❌, o líneas con **)
+            elif line_stripped.startswith('✅') or line_stripped.startswith('❌'):
+                rules.append(f"  {line_stripped}")
+            
+            # Detectar reglas en negrita
+            elif '**' in line_stripped and len(line_stripped) > 10:
+                rules.append(f"  {line_stripped}")
+            
+            # Detectar reglas que empiezan con - o números
+            elif (line_stripped.startswith('-') or 
+                  re.match(r'^\d+\.', line_stripped)) and len(line_stripped) > 10:
+                rules.append(f"  {line_stripped}")
+            
+            # Capturar texto descriptivo importante
+            elif (line_stripped and 
+                  len(line_stripped) > 30 and 
+                  not line_stripped.startswith('#') and
+                  not line_stripped.startswith('---') and
+                  ('rule' in line_stripped.lower() or 
+                   'debe' in line_stripped.lower() or
+                   'no debe' in line_stripped.lower() or
+                   'siempre' in line_stripped.lower() or
+                   'nunca' in line_stripped.lower())):
+                rules.append(f"  {line_stripped}")
+        
+        return rules
+    
     def _extract_rules_from_text(self, text: str, source: str) -> List[str]:
         """Extrae reglas de un texto"""
         rules = []
