@@ -213,19 +213,42 @@ class GUIAssistant:
         elif intent == 'rules':
             # Obtener TODAS las reglas desde la base de conocimiento completa
             logger.info("Usuario pregunta sobre reglas - usando base de conocimiento completa...")
-            rules = self.knowledge_base.get_complete_rules()
-            if rules:
-                rules_lines = rules.split('\n')
-                if len(rules_lines) > 150:
-                    response = "📋 **Todas las Reglas del Proyecto F3-OS (Base de Conocimiento Completa):**\n\n"
-                    response += '\n'.join(rules_lines[:150])
-                    response += f"\n\n... (Total: {len(rules_lines)} reglas. ¿Quieres que profundice en alguna específica?)"
+            
+            # Primero intentar obtener reglas de .cursorrules (prioridad)
+            cursorrules_content = self.knowledge_base.get_project_rules_content()
+            if cursorrules_content and "F3-OS Project Rules" in cursorrules_content:
+                response = "📋 **REGLAS DEL PROYECTO F3-OS (.cursorrules):**\n\n"
+                response += "Estas son las reglas principales que el agente debe seguir:\n\n"
+                response += "---\n\n"
+                
+                # Mostrar resumen estructurado
+                rules_summary = self.knowledge_base.get_complete_rules()
+                if rules_summary:
+                    response += rules_summary
                 else:
-                    response = "📋 **Todas las Reglas del Proyecto F3-OS:**\n\n" + rules
+                    # Si no hay resumen, mostrar contenido completo (limitado)
+                    lines = cursorrules_content.split('\n')
+                    response += '\n'.join(lines[:200])  # Primeras 200 líneas
+                    if len(lines) > 200:
+                        response += f"\n\n... (Total: {len(lines)} líneas. ¿Quieres que profundice en alguna sección específica?)"
+                
+                response += "\n\n💡 **Nota**: Estas reglas definen cómo el agente debe comportarse al trabajar en F3-OS."
             else:
-                # Fallback al analizador
-                rules = self.project_analyzer.get_rules()
-                response = "📋 **Reglas del Proyecto F3-OS:**\n\n" + (rules if rules else "No se encontraron reglas documentadas.")
+                # Fallback a reglas extraídas
+                rules = self.knowledge_base.get_complete_rules()
+                if rules:
+                    rules_lines = rules.split('\n')
+                    if len(rules_lines) > 150:
+                        response = "📋 **Todas las Reglas del Proyecto F3-OS:**\n\n"
+                        response += '\n'.join(rules_lines[:150])
+                        response += f"\n\n... (Total: {len(rules_lines)} reglas. ¿Quieres que profundice en alguna específica?)"
+                    else:
+                        response = "📋 **Todas las Reglas del Proyecto F3-OS:**\n\n" + rules
+                else:
+                    # Fallback al analizador
+                    rules = self.project_analyzer.get_rules()
+                    response = "📋 **Reglas del Proyecto F3-OS:**\n\n" + (rules if rules else "No se encontraron reglas documentadas.")
+            
             return response
         
         elif intent == 'explain_from_scratch':

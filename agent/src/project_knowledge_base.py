@@ -50,15 +50,17 @@ class ProjectKnowledgeBase:
     
     # Archivos esenciales que DEBEN cargarse
     ESSENTIAL_FILES = {
+        # Reglas del proyecto (PRIORITARIO)
+        'project_rules': '.cursorrules',  # Reglas del proyecto para el agente
         # Documentación fundamental
-        'manifesto': 'MANIFIESTO.md',
-        'reglas': 'REGLAS_LOGICA.md',
+        'manifesto': 'MANIFESTO.md',
+        'reglas': 'LOGIC_RULES.md',
         'contributing': 'CONTRIBUTING.md',
         'governance': 'GOVERNANCE.md',
         'readme': 'README.md',
         'arquitectura': 'ARQUITECTURA_COMPLETA.md',
         'seguridad': 'SEGURIDAD_Y_RESISTENCIA.md',
-        'agente': 'AGENTE_GOBERNANTE.md',
+        'agente': 'GOVERNING_AGENT.md',
         'code_of_conduct': 'CODE_OF_CONDUCT.md',
         
         # Documentación técnica
@@ -170,6 +172,14 @@ class ProjectKnowledgeBase:
     
     def _extract_all_rules(self) -> None:
         """Extrae TODAS las reglas del proyecto"""
+        # PRIORIDAD: Reglas del proyecto (.cursorrules) - Estas son las reglas principales para el agente
+        if 'project_rules' in self.knowledge.documentation:
+            rules = self._extract_rules_from_cursorrules(
+                self.knowledge.documentation['project_rules']
+            )
+            self.knowledge.rules.extend(rules)
+            logger.info(f"✅ Cargadas {len(rules)} reglas de .cursorrules")
+        
         # Reglas del manifiesto
         if 'manifesto' in self.knowledge.documentation:
             rules = self._extract_rules_from_text(
@@ -182,7 +192,7 @@ class ProjectKnowledgeBase:
         if 'reglas' in self.knowledge.documentation:
             rules = self._extract_rules_from_text(
                 self.knowledge.documentation['reglas'],
-                'REGLAS_LOGICA'
+                'LOGIC_RULES'
             )
             self.knowledge.rules.extend(rules)
         
@@ -318,11 +328,34 @@ class ProjectKnowledgeBase:
     # Métodos de consulta inmediata
     
     def get_complete_rules(self) -> str:
-        """Obtiene TODAS las reglas del proyecto"""
+        """Obtiene TODAS las reglas del proyecto, priorizando .cursorrules"""
         if not self.knowledge.rules:
             return "No se encontraron reglas documentadas."
         
-        return "\n".join(self.knowledge.rules)
+        # Priorizar reglas de .cursorrules
+        cursorrules_rules = [r for r in self.knowledge.rules if r.startswith('===') or r.startswith('---') or (not r.startswith('[') and len(r) > 5)]
+        other_rules = [r for r in self.knowledge.rules if r not in cursorrules_rules]
+        
+        result = "📋 REGLAS DEL PROYECTO F3-OS\n"
+        result += "=" * 70 + "\n\n"
+        
+        if cursorrules_rules:
+            result += "🎯 REGLAS PRINCIPALES (.cursorrules - Reglas del Agente):\n"
+            result += "-" * 70 + "\n"
+            result += "\n".join(cursorrules_rules) + "\n\n"
+        
+        if other_rules:
+            result += "📚 REGLAS ADICIONALES DE DOCUMENTACIÓN:\n"
+            result += "-" * 70 + "\n"
+            result += "\n".join(other_rules)
+        
+        return result
+    
+    def get_project_rules_content(self) -> str:
+        """Obtiene el contenido completo de .cursorrules"""
+        if 'project_rules' in self.knowledge.documentation:
+            return self.knowledge.documentation['project_rules']
+        return "Archivo .cursorrules no encontrado."
     
     def get_project_overview(self) -> str:
         """Obtiene visión completa del proyecto"""
