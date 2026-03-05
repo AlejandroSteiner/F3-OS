@@ -13,6 +13,26 @@ El agente tiene capacidad de **aprender libremente de internet** para completar 
 
 Ver [APRENDIZAJE_INTERNET.md](APRENDIZAJE_INTERNET.md) para más detalles.
 
+## 🎤 Voice Commands
+
+The assistant supports **voice commands** using Vosk (100% local, open source, no API, no credits):
+
+- ✅ **100% Local**: All processing happens on your machine
+- ✅ **No API**: Does not require external services
+- ✅ **No Credits**: Completely free
+- ✅ **Offline**: Works without internet connection
+- ✅ **Multi-language**: Supports recognition in multiple languages
+
+**Quick installation:**
+```bash
+pip install vosk
+./install_vosk_model.sh  # Downloads language model (50MB)
+```
+
+**Usage:** Click the 🎤 button in the web interface and speak your command.
+
+See [VOICE_COMMANDS.md](VOICE_COMMANDS.md) for complete documentation.
+
 ## Arquitectura
 
 El agente replica la estructura del F3 Core:

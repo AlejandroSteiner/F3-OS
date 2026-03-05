@@ -30,8 +30,16 @@ F3-OS includes a **specialized AI agent** that governs project development and a
 **Start the assistant:**
 ```bash
 cd agent
-./run.sh gui-server
+pip install -r requirements.txt  # Install dependencies
+./run.sh gui-server               # Start GUI server
 # Open: http://localhost:8080
+```
+
+**Optional - Voice Commands:**
+```bash
+pip install vosk                  # Install Vosk (100% local, free)
+./install_vosk_model.sh           # Download language model (50MB)
+# Click 🎤 button in web interface to use voice commands
 ```
 
 See [agent/README.md](agent/README.md) for more information.
@@ -272,6 +280,7 @@ This will generate `kernel.bin` in the project root.
 - ✅ Multiboot header for bootloaders
 - ✅ Build and execution scripts
 - ✅ **Governing AI Agent** with complete GUI interface
+- ✅ **Voice Commands** using Vosk (100% local, offline, free)
 
 **Known Issues**:
 - ⚠️ GRUB may have problems detecting the Multiboot header (use debugging options)

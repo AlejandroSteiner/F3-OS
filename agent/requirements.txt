@@ -19,3 +19,6 @@ colorama>=0.4.6
 tqdm>=4.66.0
 psutil>=5.9.0  # Para monitoreo de recursos del sistema
 
+# Voice recognition (Civil Technology - 100% local, no API, no credits)
+vosk>=0.3.45  # Offline speech recognition - open source, local, free
+

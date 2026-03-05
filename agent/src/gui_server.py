@@ -54,6 +54,8 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
             self._handle_close()
         elif path == '/assistant/message' or path == '/api/query':
             self._handle_message()
+        elif path == '/api/voice/process':
+            self._handle_voice_process()
         else:
             self._send_error(404, "Not Found")
     
@@ -307,6 +309,72 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
             self._send_error(400, "Invalid JSON")
         except Exception as e:
             self._send_error(500, str(e))
+    
+    def _handle_voice_process(self):
+        """Process voice audio and return recognized text"""
+        try:
+            from .voice_command import get_voice_processor
+            
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length == 0:
+                self._send_error(400, "Content-Length required")
+                return
+            
+            # Read audio data
+            audio_data = self.rfile.read(content_length)
+            
+            # Get voice processor
+            voice_processor = get_voice_processor()
+            
+            if not voice_processor.is_available():
+                self._send_json(200, {
+                    'text': '',
+                    'error': 'Voice recognition not available. Install Vosk: pip install vosk',
+                    'available': False
+                })
+                return
+            
+            # Process audio (expects WAV)
+            result = voice_processor.process_wav_bytes(audio_data)
+            
+            # If text recognized, automatically send to assistant
+            if result.get('text') and not result.get('partial') and not result.get('error'):
+                recognized_text = result['text']
+                
+                # Log activity
+                from .activity_stream import log_activity
+                log_activity(
+                    'voice_command',
+                    f"Voice command recognized: {recognized_text}",
+                    'success'
+                )
+                
+                # Process with assistant
+                try:
+                    response = self.gui.send_message(recognized_text)
+                    result['assistant_response'] = response
+                except Exception as e:
+                    result['assistant_error'] = str(e)
+            
+            self._send_json(200, {
+                'text': result.get('text', ''),
+                'confidence': result.get('confidence', 0.0),
+                'error': result.get('error'),
+                'available': True,
+                'assistant_response': result.get('assistant_response'),
+                'assistant_error': result.get('assistant_error')
+            })
+        
+        except ImportError:
+            self._send_json(200, {
+                'text': '',
+                'error': 'Vosk not installed. Install with: pip install vosk',
+                'available': False
+            })
+        except Exception as e:
+            import logging
+            logging.error(f"Error procesando voz: {e}")
+            self._send_error(500, f"Error processing voice: {str(e)}")
     
     def _send_json(self, status_code: int, data: Dict):
         """Envía respuesta JSON"""
