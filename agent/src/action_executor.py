@@ -8,6 +8,7 @@ Permite al agente ejecutar acciones reales además de responder:
 - Trabajar sobre proyectos/aplicaciones
 """
 
+import html
 import re
 import os
 import logging
@@ -100,6 +101,142 @@ class ActionExecutor:
         if matches:
             return matches[0].rstrip('.,;:)')
         return None
+    
+    def construct_url_from_query(self, text: str) -> Optional[str]:
+        """
+        Construye URL cuando el usuario dice "entra a X" o "busca en X".
+        Ej: "dolarbluehoy salta" → https://dolarhoy.com/dolar-blue-salta
+        """
+        text_lower = text.lower()
+        # Sitios conocidos de cotización argentina
+        if 'dolarbluehoy' in text_lower or 'dolar blue' in text_lower or 'dolarblue' in text_lower:
+            # dolarbluehoy.com está parked; usar dolarhoy.com (cotización nacional)
+            return 'https://dolarhoy.com'
+        if 'dolarhoy' in text_lower:
+            return 'https://dolarhoy.com'
+        if 'ambito' in text_lower:
+            return 'https://www.ambito.com/contenidos/dolar.html'
+        # Buscar patrones "entra a SITIO" o "busca en SITIO"
+        for prefix in ['entra a ', 'entrá a ', 'busca en ', 've a ', 'accede a ']:
+            if prefix in text_lower:
+                rest = text.split(prefix, 1)[-1].split(' y ')[0].strip()
+                words = re.findall(r'[\w\.]+', rest)
+                if words:
+                    site = words[0].replace(' ', '')
+                    if '.' not in site:
+                        site += '.com'
+                    if not site.startswith('http'):
+                        return f'https://{site}'
+                break
+        return None
+    
+    def fetch_web_page(self, url: str) -> Dict:
+        """
+        Obtiene contenido de una página web.
+        Returns: {success, content, title, error}
+        """
+        try:
+            import requests
+        except ImportError:
+            return {'success': False, 'content': '', 'error': 'Módulo requests no instalado.'}
+        
+        try:
+            response = requests.get(
+                url,
+                timeout=15,
+                headers={'User-Agent': 'F3-OS-Agent/1.0 (Assistant)'}
+            )
+            response.raise_for_status()
+            
+            # Extraer texto
+            html = response.text
+            text = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL | re.IGNORECASE)
+            text = re.sub(r'<style[^>]*>.*?</style>', '', text, flags=re.DOTALL | re.IGNORECASE)
+            text = re.sub(r'<[^>]+>', ' ', text)
+            text = re.sub(r'\s+', ' ', text).strip()
+            text = html.unescape(text)
+            
+            title = ''
+            if '<title' in html.lower():
+                m = re.search(r'<title[^>]*>(.*?)</title>', html, re.IGNORECASE | re.DOTALL)
+                if m:
+                    title = re.sub(r'<[^>]+>', '', m.group(1)).strip()[:200]
+            
+            return {
+                'success': True,
+                'content': text[:15000],  # Limitar tamaño
+                'title': title,
+                'url': url,
+                'error': None
+            }
+        except Exception as e:
+            logger.error(f"Error fetch {url}: {e}")
+            return {
+                'success': False,
+                'content': '',
+                'title': '',
+                'error': str(e)[:200]
+            }
+    
+    def extract_data_from_content(self, content: str, query: str) -> str:
+        """
+        Extrae datos relevantes del contenido según la consulta.
+        Para "dolar blue", "cotización", busca precios.
+        """
+        content_lower = content.lower()
+        query_lower = query.lower()
+        results = []
+        
+        # Patrones de precios (Argentina: 1.234,56 o $1234)
+        price_patterns = [
+            r'\$\s*[\d\.,]+',           # $1.234,56
+            r'[\d\.,]+\s*pesos',        # 1234 pesos
+            r'[\d\.,]+\s*ars',           # 1234 ARS
+            r'(?:compra|venta)\s*:?\s*[\d\.,]+',
+            r'(?:compra|venta)\s*[\$]?\s*[\d\.,]+',
+        ]
+        
+        if 'dolar' in query_lower or 'blue' in query_lower or 'cotización' in query_lower or 'cotizacion' in query_lower:
+            for pat in price_patterns:
+                for m in re.finditer(pat, content_lower, re.IGNORECASE):
+                    snippet = content[max(0, m.start()-50):m.end()+80]
+                    if snippet not in results:
+                        results.append(snippet.strip())
+            
+            # Buscar contexto "blue", "compra", "venta"
+            for keyword in ['blue', 'compra', 'venta', 'dólar', 'dolar']:
+                idx = content_lower.find(keyword)
+                if idx >= 0:
+                    snippet = content[max(0, idx-20):idx+150]
+                    if len(snippet) > 30 and snippet not in results:
+                        results.append(snippet.strip())
+        
+        if results:
+            return '\n\n'.join(results[:8])[:2000]
+        
+        # Fallback: devolver fragmentos que contengan términos de la query
+        words = set(re.findall(r'\w+', query_lower))
+        words.discard('entra')
+        words.discard('dime')
+        words.discard('la')
+        words.discard('de')
+        words.discard('en')
+        words.discard('frente')
+        words.discard('al')
+        words.discard('peso')
+        words.discard('pesos')
+        words.discard('argentino')
+        
+        for word in list(words)[:3]:
+            if len(word) < 4:
+                continue
+            idx = content_lower.find(word)
+            if idx >= 0:
+                snippet = content[max(0, idx-30):idx+200]
+                if len(snippet) > 20:
+                    results.append(snippet.strip())
+        
+        return '\n\n'.join(results[:5])[:1500] if results else content[:1000]
     
     def download_from_url(self, url: str, filename: Optional[str] = None) -> Dict:
         """

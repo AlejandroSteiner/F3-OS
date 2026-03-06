@@ -16,6 +16,7 @@ import logging
 from .project_analyzer import ProjectAnalyzer
 from .project_knowledge_base import ProjectKnowledgeBase
 from .action_executor import ActionExecutor
+from .capability_memory import CapabilityMemory
 
 logger = logging.getLogger(__name__)
 
@@ -85,6 +86,11 @@ class GUIAssistant:
         # Ejecutor de acciones (descargar, instalar, trabajar sobre apps)
         project_root = config.get('project_root', Path(__file__).parent.parent.parent)
         self.action_executor = ActionExecutor(config, project_root)
+        
+        # Memoria de capacidades para auto-evolución
+        pr = Path(project_root) if project_root else Path(__file__).resolve().parent.parent.parent
+        data_dir = pr / 'agent' / 'data' if (pr / 'agent').exists() else pr / 'data'
+        self.capability_memory = CapabilityMemory(data_dir)
         
         # Respuestas predefinidas
         self._init_responses()
@@ -161,11 +167,28 @@ class GUIAssistant:
         )
         self.state.conversation_history.append(assistant_message)
         
+        # Auto-evolución: registrar éxito cuando resolvimos bien (web_lookup, etc.)
+        if intent in ('web_lookup', 'internet_learning') and len(response) > 100:
+            self.capability_memory.record_success(user_input, intent)
+        
+        # Ciclo de evolución: cada 5 mensajes, analizar y aprender nuevos patrones
+        if len(self.state.conversation_history) % 10 == 0:
+            try:
+                self.capability_memory.evolve_from_unhandled()
+            except Exception as e:
+                logger.debug(f"Evolución: {e}")
+        
         return response
     
     def _analyze_intent(self, user_input: str) -> str:
-        """Analiza la intención del usuario"""
+        """Analiza la intención del usuario. Los intents aprendidos tienen prioridad."""
         input_lower = user_input.lower()
+        
+        # Auto-evolución: verificar intents aprendidos dinámicamente primero
+        learned = self.capability_memory.get_learned_intent(user_input)
+        if learned:
+            logger.info(f"Intent aprendido: {learned}")
+            return learned
         
         # Saludos (incluye "hola como estas")
         if any(word in input_lower for word in ['hola', 'hi', 'hello', 'saludo', 'buenos días', 'buenas tardes']):
@@ -229,6 +252,14 @@ class GUIAssistant:
                                                      'trabaja en esta aplicación', 'trabaja sobre esta aplicación',
                                                      'trabaja sobre esta app', 'analiza esta aplicación']):
             return 'work_on_app'
+        
+        # Web lookup: entrar a sitio, dime cotización, busca en URL
+        if any(phrase in input_lower for phrase in ['entra a', 'entrá a', 'busca en', 've a ', 'accede a',
+                                                     'dime la cotización', 'dime la cotizacion',
+                                                     'cuál es la cotización', 'cuanto está el dolar',
+                                                     'cotización del dolar', 'cotizacion del dolar',
+                                                     'dolar blue en', 'dolar blue salta']):
+            return 'web_lookup'
         
         # Ayuda general
         if any(word in input_lower for word in ['ayuda', 'help', 'qué puedes hacer']):
@@ -434,6 +465,40 @@ class GUIAssistant:
             
             return response
         
+        elif intent == 'web_lookup':
+            # Ejecuta: entra a URL, extrae datos (ej. cotización dolar blue)
+            url = self.action_executor.extract_url_from_text(user_input)
+            if not url:
+                url = self.action_executor.construct_url_from_query(user_input)
+            
+            if not url:
+                return ("⚠️ No pude identificar a qué sitio entrar.\n\n"
+                        "Prueba incluyendo la URL completa o el nombre del sitio, "
+                        "ej: \"entra a dolarhoy.com y dime la cotización del dolar blue\"")
+            
+            result = self.action_executor.fetch_web_page(url)
+            if not result['success']:
+                self.capability_memory.record_web_lookup_attempt(user_input, url, False)
+                return f"❌ **Error al acceder a {url}:**\n\n{result.get('error', 'Error desconocido')}"
+            
+            extracted = self.action_executor.extract_data_from_content(
+                result['content'], user_input
+            )
+            self.capability_memory.record_web_lookup_attempt(user_input, url, True)
+            
+            response = f"🌐 **Datos de {url}:**\n\n"
+            response += f"_{result.get('title', 'Sin título')}_\n\n"
+            if extracted:
+                response += "**Información extraída:**\n\n"
+                response += extracted[:2500]
+                if len(extracted) > 2500:
+                    response += "\n\n_(contenido recortado)_"
+            else:
+                response += "No pude extraer datos específicos del contenido. "
+                response += "El sitio podría tener estructura diferente. "
+                response += f"\n\nContenido inicial: {result['content'][:500]}..."
+            return response
+        
         elif intent == 'help':
             response = "🤖 **Puedo ayudarte con:**\n\n"
             response += "- 👋 Saludar y conversar (\"hola, ¿cómo estás?\")\n"
@@ -443,6 +508,7 @@ class GUIAssistant:
             response += "- 📊 Ver estado del sistema\n"
             response += "- 📍 Saber en qué trabajo (\"¿qué estás haciendo?\")\n"
             response += "- 🌐 Verificar conexión a internet\n"
+            response += "- 🌐 **Consultar web** (\"entra a dolarhoy.com y dime la cotización\")\n"
             response += "- 📥 **Descargar** archivos (incluye URL en tu mensaje)\n"
             response += "- 📦 **Instalar** paquetes pip (\"instala requests\")\n"
             response += "- 🔧 **Trabajar sobre** apps o archivos del proyecto\n"
@@ -492,6 +558,26 @@ class GUIAssistant:
             return response
         
         else:  # general
+            # Auto-evolución: si la consulta sugiere web lookup, intentar primero
+            if self.capability_memory.should_try_web_lookup(user_input):
+                logger.info(f"Auto-evolución: intentando web_lookup para: {user_input[:50]}...")
+                url = self.action_executor.extract_url_from_text(user_input) or \
+                      self.action_executor.construct_url_from_query(user_input)
+                if url:
+                    result = self.action_executor.fetch_web_page(url)
+                    if result['success'] and result.get('content'):
+                        extracted = self.action_executor.extract_data_from_content(
+                            result['content'], user_input
+                        )
+                        if extracted and len(extracted) > 50:
+                            self.capability_memory.record_web_lookup_attempt(user_input, url, True)
+                            self.capability_memory.record_success(user_input, 'web_lookup')
+                            return (f"🌐 **Encontré información (auto-evolución):**\n\n"
+                                    f"Fuente: {url}\n\n{extracted[:2000]}")
+                    self.capability_memory.record_web_lookup_attempt(
+                        user_input, url or 'N/A', False
+                    )
+            
             # Resolución inmediata usando base de conocimiento completa
             logger.info(f"Resolviendo consulta inmediata: {user_input[:50]}...")
             immediate_response = self.knowledge_base.resolve_query_immediate(user_input)
@@ -509,8 +595,19 @@ class GUIAssistant:
                         response += f"**En {filename}:**\n{content[:500]}...\n\n"
                     response += "¿Quieres que profundice en algún aspecto específico?"
                 else:
-                    # Si no hay información local, intentar aprender de internet
-                    logger.info(f"No se encontró información local, intentando aprendizaje en internet: {user_input}")
+                    # Si no hay información local, intentar web fetch genérico
+                    url = self.action_executor.extract_url_from_text(user_input)
+                    if url:
+                        result = self.action_executor.fetch_web_page(url)
+                        if result['success']:
+                            extracted = self.action_executor.extract_data_from_content(
+                                result['content'], user_input
+                            )
+                            if extracted:
+                                return (f"🌐 **Contenido de {url}:**\n\n{extracted[:2000]}")
+                    
+                    # Intentar aprendizaje en internet
+                    logger.info(f"No se encontró información local, intentando internet: {user_input}")
                     learned_sources = self.internet_learner.search_and_learn(user_input, max_results=2)
                     
                     if learned_sources:
@@ -521,29 +618,39 @@ class GUIAssistant:
                             response += f"Fuente: {source.url}\n\n"
                         response += "💡 Este conocimiento se ha integrado para completar el propósito del proyecto."
                     else:
+                        # Registrar para auto-evolución futura
+                        self.capability_memory.record_unhandled(user_input, 'general')
                         return self._generate_general_response(user_input)
             return response
     
     def _generate_general_response(self, user_input: str) -> str:
-        """Genera respuesta general conversacional"""
-        # Respuestas amigables según personalidad
+        """Genera respuesta general conversacional usando contexto de la conversación"""
+        # Usar historial para respuestas contextuales (evolución hacia conversación fluida)
+        last_user_msgs = [
+            m.content for m in self.state.conversation_history[-6:]
+            if m.role == 'user'
+        ][-2:]
+        context_hint = ' '.join(last_user_msgs).lower() if last_user_msgs else ''
+        
+        # Si el usuario preguntaba sobre algo específico (web, datos, cotización), no responder "modelo F3"
+        if any(w in context_hint or w in user_input.lower() for w in 
+               ['dolar', 'cotización', 'precio', 'entra', 'busca', 'web', 'internet']):
+            return (
+                "No pude obtener esa información. ¿Podrías darme la URL exacta del sitio "
+                "o reformular la pregunta? También puedo ayudarte con F3-OS, desarrollo o el modelo del sistema."
+            )
+        
+        # Respuestas adaptativas según historial
         if self.state.personality == AssistantPersonality.FRIENDLY:
-            responses = [
-                "Interesante pregunta. Déjame pensar...",
-                "Eso es algo que puedo ayudarte a entender.",
-                "Buena pregunta. Te explico:",
-            ]
-            return f"{responses[0]} ¿Podrías ser más específico sobre qué te interesa de F3-OS?"
+            return "Interesante pregunta. ¿Podrías ser más específico? Puedo ayudarte con F3-OS, consultas web, o desarrollo."
         
         elif self.state.personality == AssistantPersonality.TECHNICAL:
-            return "Necesito más contexto técnico. ¿Podrías especificar qué aspecto de F3-OS te interesa?"
+            return "Necesito más contexto. ¿Es sobre F3-OS, datos externos, o algo más específico?"
         
-        else:  # ADAPTIVE
-            # Adaptarse según historial
-            if len(self.state.conversation_history) > 2:
-                return "Basándome en nuestra conversación, creo que te interesa el modelo F3. ¿Quieres que te explique algo específico?"
-            else:
-                return "¿Podrías ser más específico? Puedo ayudarte con el modelo F3, navegación, o desarrollo."
+        else:  # ADAPTIVE - responder según lo que el usuario ha estado preguntando
+            if len(self.state.conversation_history) > 4:
+                return "Entiendo. ¿Quieres que intente buscar en la web, o prefieres que te explique algo de F3-OS?"
+            return "¿Podrías ser más específico? Puedo: buscar en web, ayudarte con F3-OS, o desarrollo."
     
     def get_conversation_history(self, limit: Optional[int] = None) -> List[Message]:
         """Obtiene historial de conversación"""

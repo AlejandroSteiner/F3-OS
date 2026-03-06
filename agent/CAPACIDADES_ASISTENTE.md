@@ -73,7 +73,15 @@ El asistente puede leer y analizar automáticamente los siguientes archivos:
 
 **Respuesta:** El asistente busca en todos los archivos del proyecto y proporciona información relevante encontrada.
 
-### 3. Respuestas Conversacionales + Acciones Ejecutables
+### 3. Consultas Web + Auto-Evolución
+
+- **"Entra a dolarhoy y dime la cotización del dolar blue"** → Accede a la web, extrae los datos y responde
+- **Auto-evolución**: Si la consulta sugiere datos web (cotización, precios, etc.) y no coincide con intents específicos, el asistente intenta web lookup automáticamente
+- **Capability Memory**: Las consultas no resueltas se registran en `agent/data/capability_memory.json`
+- **Intents aprendidos**: Cuando 2+ consultas no resueltas comparten palabras clave, el asistente aprende un nuevo patrón y lo guarda en `learned_intents.json`. Las próximas consultas similares se reconocen automáticamente (ej: "euro precio hoy" → web_lookup)
+- **Respuestas contextuales**: El asistente usa el historial de conversación para evitar respuestas genéricas irrelevantes y ofrecer alternativas según lo que el usuario ha preguntado
+
+### 4. Respuestas Conversacionales + Acciones Ejecutables
 
 El asistente **responde Y ejecuta** para las siguientes instrucciones:
 
