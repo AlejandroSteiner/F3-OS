@@ -6,7 +6,7 @@ Proporciona API HTTP simple para que la GUI del sistema se comunique con el asis
 
 import json
 from typing import Dict, Optional
-from http.server import HTTPServer, BaseHTTPRequestHandler
+from http.server import HTTPServer, BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 import threading
 
@@ -378,11 +378,15 @@ class AssistantHTTPHandler(BaseHTTPRequestHandler):
     
     def _send_json(self, status_code: int, data: Dict):
         """Envía respuesta JSON"""
-        self.send_response(status_code)
-        self.send_header('Content-Type', 'application/json')
-        self.send_header('Access-Control-Allow-Origin', '*')  # Para desarrollo
-        self.end_headers()
-        self.wfile.write(json.dumps(data).encode('utf-8'))
+        try:
+            self.send_response(status_code)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')  # Para desarrollo
+            self.end_headers()
+            self.wfile.write(json.dumps(data).encode('utf-8'))
+        except (BrokenPipeError, ConnectionResetError):
+            # Cliente desconectó antes de recibir la respuesta (normal al navegar rápido)
+            pass
     
     def _send_error(self, status_code: int, message: str):
         """Envía error"""
@@ -433,9 +437,10 @@ class GUIServer:
                     else:
                         raise OSError(f"No se pudo encontrar un puerto disponible después de {max_attempts} intentos")
                 
-                # Puerto disponible, crear servidor
+                # Puerto disponible, crear servidor (ThreadingHTTPServer para que
+                # el stream SSE no bloquee las peticiones POST de mensajes)
                 # Escuchar en 0.0.0.0 para que sea accesible desde QEMU/F3-OS
-                self.server = HTTPServer(('0.0.0.0', self.port), handler_factory)
+                self.server = ThreadingHTTPServer(('0.0.0.0', self.port), handler_factory)
                 if original_port != self.port:
                     print(f"ℹ️  Usando puerto {self.port} (el puerto {original_port} estaba ocupado)")
                 break

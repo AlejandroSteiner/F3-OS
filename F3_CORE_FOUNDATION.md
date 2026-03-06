@@ -86,3 +86,4 @@ The F3 Core funnel is not just a software abstraction - it's a **frequency synth
 
 
 
+

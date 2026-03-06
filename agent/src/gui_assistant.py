@@ -4,7 +4,9 @@ GUI Assistant - Asistente/Amigo del usuario en la GUI de F3-OS
 El agente gobernante también funciona como asistente amigable dentro de la GUI.
 """
 
+import re
 import time
+from pathlib import Path
 from typing import Dict, List, Optional, Callable
 from dataclasses import dataclass
 from datetime import datetime
@@ -13,6 +15,7 @@ import logging
 
 from .project_analyzer import ProjectAnalyzer
 from .project_knowledge_base import ProjectKnowledgeBase
+from .action_executor import ActionExecutor
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +81,10 @@ class GUIAssistant:
             from .internet_learning import InternetLearner, NetworkManager
             network_manager = NetworkManager(config)
             self.internet_learner = InternetLearner(config, network_manager)
+        
+        # Ejecutor de acciones (descargar, instalar, trabajar sobre apps)
+        project_root = config.get('project_root', Path(__file__).parent.parent.parent)
+        self.action_executor = ActionExecutor(config, project_root)
         
         # Respuestas predefinidas
         self._init_responses()
@@ -160,8 +167,8 @@ class GUIAssistant:
         """Analiza la intención del usuario"""
         input_lower = user_input.lower()
         
-        # Saludos
-        if any(word in input_lower for word in ['hola', 'hi', 'hello', 'saludo']):
+        # Saludos (incluye "hola como estas")
+        if any(word in input_lower for word in ['hola', 'hi', 'hello', 'saludo', 'buenos días', 'buenas tardes']):
             return 'greeting'
         
         # Preguntas sobre reglas (alta prioridad)
@@ -194,6 +201,35 @@ class GUIAssistant:
         if any(word in input_lower for word in ['estado', 'status', 'fase actual', 'qué está pasando']):
             return 'system_status'
         
+        # ¿Qué estás haciendo? / ¿En qué trabajas?
+        if any(phrase in input_lower for phrase in ['qué estás haciendo', 'que estas haciendo', 'en qué trabajas',
+                                                     'en que trabajas', 'qué haces ahora', 'que haces ahora',
+                                                     'qué haces', 'que haces', 'en qué trabajas ahora']):
+            return 'current_activity'
+        
+        # ¿Estás conectado a internet?
+        if any(phrase in input_lower for phrase in ['estás conectado', 'estas conectado', 'tienes internet',
+                                                     'hay internet', 'conexión a internet', 'conexion a internet',
+                                                     'conectado a internet']):
+            return 'internet_status'
+        
+        # Busca y descarga / descarga desde enlace
+        if any(word in input_lower for word in ['descarga', 'descargar', 'descargame', 'descárgame',
+                                                 'busca este enlace', 'busca el enlace', 'descarga esta aplicación',
+                                                 'descarga esta app']) or ('enlace' in input_lower and 'descargar' in input_lower):
+            return 'download_action'
+        
+        # Instala aplicación
+        if any(phrase in input_lower for phrase in ['instala', 'instalar', 'instala esta aplicación',
+                                                     'instala esta app', 'instala el paquete', 'instala la aplicación']):
+            return 'install_action'
+        
+        # Trabaja sobre esta aplicación
+        if any(phrase in input_lower for phrase in ['trabaja sobre', 'trabaja en', 'trabaja con',
+                                                     'trabaja en esta aplicación', 'trabaja sobre esta aplicación',
+                                                     'trabaja sobre esta app', 'analiza esta aplicación']):
+            return 'work_on_app'
+        
         # Ayuda general
         if any(word in input_lower for word in ['ayuda', 'help', 'qué puedes hacer']):
             return 'help'
@@ -208,6 +244,11 @@ class GUIAssistant:
     def _generate_response(self, intent: str, user_input: str, context: Optional[Dict]) -> str:
         """Genera respuesta según intención"""
         if intent == 'greeting':
+            # Incluye "hola como estas", "hola que tal"
+            input_lower = user_input.lower()
+            if any(p in input_lower for p in ['cómo estás', 'como estas', 'qué tal', 'que tal', 'how are you']):
+                return (f"¡Hola {self.state.user_name}! Estoy bien, gracias. "
+                        "Listo para ayudarte con F3-OS. ¿En qué puedo colaborar hoy?")
             return f"¡Hola {self.state.user_name}! ¿En qué puedo ayudarte hoy?"
         
         elif intent == 'rules':
@@ -301,6 +342,84 @@ class GUIAssistant:
                 response = self.help_responses.get('development', 'Soy el agente gobernante. ¿Tienes alguna pregunta sobre desarrollo?')
             return response
         
+        elif intent == 'current_activity':
+            # Respuesta + ejecuta: obtiene actividad real
+            activity = self.action_executor.get_current_activity()
+            return f"📋 **En qué trabajo ahora:**\n\n{activity}"
+        
+        elif intent == 'internet_status':
+            # Respuesta + ejecuta: verifica conexión real
+            connected, message = self.action_executor.check_internet_connection()
+            return f"🌐 **Conexión a Internet:**\n\n{message}"
+        
+        elif intent == 'download_action':
+            # Ejecuta: extrae URL y descarga
+            url = self.action_executor.extract_url_from_text(user_input)
+            if not url:
+                return ("⚠️ No encontré ninguna URL en tu mensaje.\n\n"
+                        "Por favor, incluye el enlace. Ejemplo: "
+                        "\"Descarga esta aplicación: https://ejemplo.com/app.zip\"")
+            
+            result = self.action_executor.download_from_url(url)
+            if result['success']:
+                return (f"✅ **Descarga completada:**\n\n"
+                        f"Archivo guardado en: `{result['path']}`\n"
+                        f"Tamaño: {result['size']:,} bytes\n"
+                        f"Nombre: {result['filename']}")
+            else:
+                return f"❌ **Error al descargar:**\n\n{result['error']}"
+        
+        elif intent == 'install_action':
+            # Ejecuta: extrae nombre del paquete y instala
+            # Buscar nombres de paquete (palabras tras "instala")
+            input_lower = user_input.lower()
+            package = None
+            for prefix in ['instala', 'instalar']:
+                if prefix in input_lower:
+                    rest = user_input.split(prefix, 1)[-1].strip()
+                    # Quitar puntuación y tomar primera palabra o conjunto
+                    words = re.findall(r'[\w\-\.]+', rest)
+                    if words:
+                        package = words[0]  # Primer token
+                    break
+            
+            if not package or len(package) < 2:
+                return ("⚠️ No pude identificar qué paquete instalar.\n\n"
+                        "Por favor especifica: \"Instala requests\" o \"Instala el paquete numpy\"")
+            
+            result = self.action_executor.install_package(package)
+            if result['success']:
+                return f"✅ **Paquete instalado:**\n\n{package} instalado correctamente."
+            else:
+                return f"❌ **Error al instalar {package}:**\n\n{result.get('error', result.get('output', 'Error desconocido'))}"
+        
+        elif intent == 'work_on_app':
+            # Ejecuta: extrae ruta/nombre y analiza
+            input_lower = user_input.lower()
+            path = None
+            for prefix in ['trabaja sobre', 'trabaja en', 'trabaja con', 'analiza esta', 'trabaja en esta', 'trabaja sobre esta']:
+                if prefix in input_lower:
+                    rest = user_input.split(prefix, 1)[-1].strip()
+                    rest = rest.replace('aplicación', '').replace('aplicacion', '').replace('app', '').strip(' :,.-')
+                    if rest:
+                        path = rest
+                    break
+            
+            if not path:
+                # Usar proyecto actual
+                path = '.'
+            
+            result = self.action_executor.work_on_application(path)
+            if result['success']:
+                response = f"📂 **Análisis de {path}:**\n\n{result['analysis']}\n\n"
+                if result.get('suggestions'):
+                    response += "**Siguientes pasos posibles:**\n"
+                    for s in result['suggestions']:
+                        response += f"- {s}\n"
+                return response
+            else:
+                return f"❌ **No pude trabajar sobre eso:**\n\n{result.get('error', 'Error desconocido')}"
+        
         elif intent == 'system_status':
             status = self.governance_core.get_status()
             response = f"📊 **Estado del Sistema F3-OS:**\n\n"
@@ -317,15 +436,18 @@ class GUIAssistant:
         
         elif intent == 'help':
             response = "🤖 **Puedo ayudarte con:**\n\n"
+            response += "- 👋 Saludar y conversar (\"hola, ¿cómo estás?\")\n"
             response += "- 📋 Explicar las reglas del proyecto\n"
             response += "- 🔷 Explicar el modelo F3\n"
             response += "- 🔄 Explicar el ciclo de fases\n"
             response += "- 📊 Ver estado del sistema\n"
-            response += "- 💻 Preguntas sobre desarrollo\n"
-            response += "- 📚 Explicación completa desde cero\n"
-            response += "- 🧭 Navegar por el sistema\n"
-            response += "- 🌐 Aprender de internet (hasta 50% de red disponible)\n\n"
-            response += "¿Qué te gustaría saber?"
+            response += "- 📍 Saber en qué trabajo (\"¿qué estás haciendo?\")\n"
+            response += "- 🌐 Verificar conexión a internet\n"
+            response += "- 📥 **Descargar** archivos (incluye URL en tu mensaje)\n"
+            response += "- 📦 **Instalar** paquetes pip (\"instala requests\")\n"
+            response += "- 🔧 **Trabajar sobre** apps o archivos del proyecto\n"
+            response += "- 🌐 Aprender de internet\n\n"
+            response += "¿Qué te gustaría hacer?"
             return response
         
         elif intent == 'internet_learning':
@@ -441,12 +563,13 @@ class GUIAssistant:
     def get_suggestions(self) -> List[str]:
         """Obtiene sugerencias de preguntas/comandos"""
         suggestions = [
+            "¿Hola, cómo estás?",
+            "¿Qué estás haciendo ahora?",
+            "¿Estás conectado a internet?",
             "¿Cuáles son tus reglas?",
             "Explicame desde cero",
             "¿Qué es el modelo F3?",
             "¿En qué fase está el sistema?",
-            "Muéstrame el estado del sistema",
-            "¿Cómo funciona el ciclo de fases?",
             "¿Qué puedes hacer?",
         ]
         return suggestions

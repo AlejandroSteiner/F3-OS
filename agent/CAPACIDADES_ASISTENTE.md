@@ -73,6 +73,25 @@ El asistente puede leer y analizar automáticamente los siguientes archivos:
 
 **Respuesta:** El asistente busca en todos los archivos del proyecto y proporciona información relevante encontrada.
 
+### 3. Respuestas Conversacionales + Acciones Ejecutables
+
+El asistente **responde Y ejecuta** para las siguientes instrucciones:
+
+#### 👋 Saludos y Estado
+- **"Hola, ¿cómo estás?"** → Responde amigablemente
+- **"¿Qué estás haciendo?"** / **"¿En qué trabajas ahora?"** → Muestra actividad reciente real del agente
+- **"¿Estás conectado a internet?"** → Verifica la conexión y responde con el resultado real
+
+#### 📥 Descargar
+- **"Busca este enlace y descarga esta aplicación: https://..."** → Descarga el archivo y lo guarda en `agent/downloads/`
+- Incluye una URL en tu mensaje para que descargue
+
+#### 📦 Instalar
+- **"Instala requests"** / **"Instala el paquete numpy"** → Ejecuta `pip install` del paquete indicado
+
+#### 🔧 Trabajar sobre Aplicación
+- **"Trabaja sobre kernel"** / **"Trabaja sobre agent/gui_assistant.py"** → Analiza el archivo o directorio y sugiere siguientes pasos
+
 ## 🎯 Cómo Funciona
 
 ### ProjectAnalyzer
@@ -96,8 +115,14 @@ El módulo `project_analyzer.py` proporciona:
 
 El asistente ahora detecta:
 
-- **Reglas**: "reglas", "rules", "tus reglas", "las reglas"
-- **Explicación desde cero**: "explicame desde cero", "analiza", "comprender el proyecto"
+- **Saludos**: "hola", "cómo estás", "qué tal"
+- **Actividad actual**: "qué estás haciendo", "en qué trabajas"
+- **Internet**: "estás conectado", "tienes internet"
+- **Descargar**: "descarga", "descargar", "busca este enlace"
+- **Instalar**: "instala", "instalar paquete"
+- **Trabajar sobre**: "trabaja sobre", "trabaja en", "analiza esta aplicación"
+- **Reglas**: "reglas", "rules", "tus reglas"
+- **Explicación desde cero**: "explicame desde cero", "analiza"
 - **Modelo F3**: "f3", "modelo", "hilos", "embudo"
 - **Fases**: "fase", "lógico", "ilógico", "síntesis", "perfecto"
 - **Desarrollo**: "desarrollo", "pr", "código", "contribuir"
@@ -159,6 +184,7 @@ project_root: "/ruta/al/proyecto/f3-os"
 - [ ] Soporte para más tipos de archivos
 - [ ] Análisis de código fuente (Rust)
 - [ ] Generación de diagramas explicativos
+
 
 
 
